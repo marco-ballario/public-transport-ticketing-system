@@ -1,0 +1,9 @@
+server:
+  port: 8761
+  response-cache-update-interval-ms: 500
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
