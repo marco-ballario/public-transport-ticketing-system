@@ -3,6 +3,25 @@ server:
 spring:
   application:
     name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: login-service
+          uri: lb://login-service
+          predicates:
+            - Path=/user/**
+        - id: traveler-service
+          uri: lb://traveler-service
+          predicates:
+            - Path=/admin/travelers, /admin/traveler/**, /my/**
+        - id: catalogue-service
+          uri: lb://catalogue-service
+          predicates:
+            - Path=/tickets, /orders/**, /admin/orders/**, /admin/tickets, /shop
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/product, /transactions, /admin/transactions
 eureka:
   instance:
     preferIpAddress: true
