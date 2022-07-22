@@ -6,5 +6,6 @@ include(
     "gateway-service",
     "login-service",
     "payment-service",
+    "report-service",
     "traveler-service"
 )
