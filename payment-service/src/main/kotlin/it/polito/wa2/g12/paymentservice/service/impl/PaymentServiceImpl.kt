@@ -36,8 +36,6 @@ class PaymentServiceImpl : PaymentService {
             it.issuedAt.isAfter(initData) &&
             it.issuedAt.isBefore(finalData)
         }.map { it.toDTO() }
-        println(dataRange.initialData)
-        println(dataRange.finalData)
         return Report(
             transactionList.count(),
             transactionList.toList().sumOf { it.amount }.toFloat(),
