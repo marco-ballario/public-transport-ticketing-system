@@ -5,7 +5,7 @@ import it.polito.wa2.g12.catalogueservice.dto.PaymentInfoDTO
 import it.polito.wa2.g12.catalogueservice.dto.TicketDTO
 import kotlinx.coroutines.flow.Flow
 
-interface catalogueservice {
+interface CatalogueService {
     fun getAllTickets(): Flow<TicketDTO>
     fun getAllOrders(): Flow<OrderDTO>
     fun getAllUserOrders(username: String): Flow<OrderDTO>

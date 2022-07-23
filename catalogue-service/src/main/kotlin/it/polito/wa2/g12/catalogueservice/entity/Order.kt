@@ -7,17 +7,12 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table("orders")
 data class Order(
-    @Column
-    var quantity: Int,
-    @Column
-    var status: String,
-    @Column
-    var username: String,
-    @Column
-    var ticketId: Long
+    @Column var ticketId: Long,
+    @Column var quantity: Int,
+    @Column var username: String,
+    @Column var status: String
 ) {
-    @Id
-    var id: Long? = null
+    @Id var id: Long? = null
 }
 
-fun Order.toDTO() = OrderDTO(id!!, quantity, status, username, ticketId)
+fun Order.toDTO() = OrderDTO(id!!, ticketId, quantity, username, status)

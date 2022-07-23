@@ -1,12 +1,14 @@
 package it.polito.wa2.g12.catalogueservice.dto
 
+import it.polito.wa2.g12.catalogueservice.enum.TicketType
+
 class TicketDTO(
     val id: Long,
-    val price: Double,
-    val ticket_type: String,
+    val name: String,
+    val type: TicketType,
+    val duration: Int?,
     val zones: String,
-    val minimum_age: Int,
-    val maximum_age: Int,
-    val duration: Int,
-    val only_weekends: Boolean
+    val price: Double,
+    val min_age: Int?,
+    val max_age: Int?,
 )

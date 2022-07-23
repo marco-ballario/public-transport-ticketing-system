@@ -43,11 +43,10 @@ class Consumer {
                 var order = runBlocking { orderRepository.findById(message.order_id.toLong()) }
                 val ticket: TicketDTO? = runBlocking { ticketRepository.findById(order!!.ticketId)?.toDTO() }
                 val ticketsToAcquire = TicketsToAcquireDTO(
-                    ticket!!.ticket_type,
-                    order!!.quantity,
-                    ticket.zones,
+                    ticket!!.type.name,
                     ticket.duration,
-                    ticket.only_weekends,
+                    ticket.zones,
+                    order!!.quantity,
                     order.username
                 )
                 val mapper = jacksonObjectMapper()
@@ -55,7 +54,7 @@ class Consumer {
 
                 // Sends the request to generate the tickets
                 val acquiredTickets: List<AcquiredTicketDTO> = WebClient
-                    .create("http://localhost:8081")
+                    .create("http://localhost:8082")
                     .post()
                     .uri("/my/tickets/acquired")
                     .header("Authorization", message.jwt)
