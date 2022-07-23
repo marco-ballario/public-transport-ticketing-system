@@ -25,15 +25,23 @@ class Consumer {
     fun paymentListener(consumerRecord: ConsumerRecord<Any, Any>, ack: Acknowledgment) {
         val bankMessage: BankMessage = consumerRecord.value() as BankMessage
         println(bankMessage)
-        //check credit card ifo are correct
+
+        // Checks if the credit card info are correct
         val format = SimpleDateFormat("MM/yy")
         val exp = format.parse(bankMessage.exp)
-        if ((bankMessage.ccn.length == 16 || bankMessage.ccn.length == 15) && bankMessage.card_holder.isNotEmpty() && bankMessage.cvv.length == 3 && exp.after(
-                Date()
-            ) && kotlin.random.Random.nextInt(0, 100) < 70
-        ) {
+        if ((bankMessage.ccn.length == 16 || bankMessage.ccn.length == 15) &&
+            bankMessage.card_holder.isNotEmpty() &&
+            bankMessage.cvv.length == 3 &&
+            exp.after(Date()) &&
+            kotlin.random.Random.nextInt(0, 100) < 70) {
             val message: Message<BankPaymentMessage> = MessageBuilder
-                .withPayload(BankPaymentMessage(bankMessage.transaction_id, "SUCCESSFUL", bankMessage.jwt))
+                .withPayload(
+                    BankPaymentMessage(
+                        bankMessage.transaction_id,
+                        "SUCCESSFUL",
+                        bankMessage.jwt
+                    )
+                )
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
                 .build()
@@ -41,7 +49,13 @@ class Consumer {
             println(message)
         } else {
             val message: Message<BankPaymentMessage> = MessageBuilder
-                .withPayload(BankPaymentMessage(bankMessage.transaction_id, "FAILED", bankMessage.jwt))
+                .withPayload(
+                    BankPaymentMessage(
+                        bankMessage.transaction_id,
+                        "FAILED",
+                        bankMessage.jwt
+                    )
+                )
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
                 .build()
