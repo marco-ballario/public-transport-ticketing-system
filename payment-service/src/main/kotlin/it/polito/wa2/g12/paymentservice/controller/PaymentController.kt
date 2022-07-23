@@ -31,7 +31,6 @@ class PaymentController(val paymentService: PaymentServiceImpl) {
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: DataRangeDTO
     ): Flow<Report> {
-        println("prova")
         return paymentService.getGlobalReport(dataRange)
     }
 }

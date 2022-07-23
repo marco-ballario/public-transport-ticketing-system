@@ -1,7 +1,6 @@
 package it.polito.wa2.g12.reportservice.controller
 
 import it.polito.wa2.g12.reportservice.dto.DataRangeDTO
-import it.polito.wa2.g12.reportservice.service.Report
 import it.polito.wa2.g12.reportservice.service.impl.ReportServiceImpl
 import kotlinx.coroutines.flow.Flow
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,7 +16,7 @@ class Controller(val reportservice: ReportServiceImpl) {
     suspend fun globalReport(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: DataRangeDTO
-    ): Flow<Report> {
+    ): Flow<String> {
         return reportservice.getGlobalReport(authorizationHeader, dataRange)
     }
 }
