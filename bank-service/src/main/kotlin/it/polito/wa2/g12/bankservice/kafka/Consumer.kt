@@ -33,7 +33,7 @@ class Consumer {
             ) && kotlin.random.Random.nextInt(0, 100) < 70
         ) {
             val message: Message<BankPaymentMessage> = MessageBuilder
-                .withPayload(BankPaymentMessage(bankMessage.transaction_id, "SUCCESS", bankMessage.jwt))
+                .withPayload(BankPaymentMessage(bankMessage.transaction_id, "SUCCESSFUL", bankMessage.jwt))
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
                 .build()
@@ -41,7 +41,7 @@ class Consumer {
             println(message)
         } else {
             val message: Message<BankPaymentMessage> = MessageBuilder
-                .withPayload(BankPaymentMessage(bankMessage.transaction_id, "FAILURE", bankMessage.jwt))
+                .withPayload(BankPaymentMessage(bankMessage.transaction_id, "FAILED", bankMessage.jwt))
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
                 .build()

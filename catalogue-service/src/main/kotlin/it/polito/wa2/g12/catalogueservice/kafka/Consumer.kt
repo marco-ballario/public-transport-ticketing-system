@@ -30,7 +30,7 @@ class Consumer {
     @KafkaListener(topics = ["\${kafka.topics.transaction}"], groupId = "ppr")
     fun paymentListener(consumerRecord: ConsumerRecord<Any, Any>, ack: Acknowledgment) {
         val message = consumerRecord.value() as TransactionMessage
-        if (message.status == "FAILURE") {
+        if (message.status == "FAILED") {
             mono {
                 var order = orderRepository.findById(message.order_id.toLong())
                 order

@@ -15,10 +15,10 @@ class PaymentServiceImpl : PaymentService {
     lateinit var transactionRepository: TransactionRepository
 
     override fun getAllTransactions(): Flow<TransactionDTO> {
-        return transactionRepository.findAllTransactions().map { it.toDTO() }
+        return transactionRepository.findAll().map { it.toDTO() }
     }
 
     override fun getAllUserTransactions(username: String): Flow<TransactionDTO> {
-        return transactionRepository.findAllUserTransactions(username).map { it.toDTO() }
+        return transactionRepository.findAllByUsername(username).map { it.toDTO() }
     }
 }

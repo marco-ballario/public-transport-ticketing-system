@@ -1,7 +1,6 @@
 package it.polito.wa2.g12.paymentservice.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import it.polito.wa2.g12.catalogueservice.kafka.TransactionMessage
 import org.apache.kafka.common.errors.SerializationException
 import org.apache.kafka.common.serialization.Serializer
 

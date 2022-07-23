@@ -86,7 +86,14 @@ class CatalogueServiceImpl : CatalogueService {
     }
 
     override suspend fun shopTickets(username: String, paymentInfo: PaymentInfoDTO, jwt: String): OrderDTO {
-        val ticket: TicketDTO? = ticketRepository.findById(paymentInfo.ticket_id)?.toDTO()
+        // Gets the ticket from the catalogue
+        val ticket: TicketDTO = ticketRepository.findById(paymentInfo.ticket_id)?.toDTO() ?:
+            // Ticket not present in the catalogue
+             return orderRepository.save(
+                Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "FAILED")
+            ).toDTO()
+
+        // Gets profile information about the purchaser
         val response: UserProfileDTO = WebClient
             .create("http://localhost:8082")
             .get()
@@ -95,39 +102,35 @@ class CatalogueServiceImpl : CatalogueService {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .awaitBody()
-
-        // Ticket not found
-        if (ticket == null) {
-            val order = orderRepository.save(Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "FAILURE"))
-            return order.toDTO()
+        // Age requirements not respected
+        if (!isValidAge(ticket, response)) {
+            return orderRepository.save(
+                Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "FAILED")
+            ).toDTO()
         }
 
-        if (isValidAge(ticket, response)) {
-            var newOrder = Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "PENDING")
-            newOrder = orderRepository.save(newOrder)
-            val price = BigDecimal.valueOf(paymentInfo.quantity * ticket.price)
-            val message: Message<BillingMessage> = MessageBuilder
-                .withPayload(
-                    BillingMessage(
-                        newOrder.id!!.toInt(),
-                        price,
-                        paymentInfo.card_number,
-                        paymentInfo.card_expiration,
-                        paymentInfo.card_cvv.toString(),
-                        paymentInfo.card_holder,
-                        username,
-                        jwt
-                    )
+        var newOrder = Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "PENDING")
+        newOrder = orderRepository.save(newOrder)
+        val price = BigDecimal.valueOf(paymentInfo.quantity * ticket.price)
+
+        val message: Message<BillingMessage> = MessageBuilder
+            .withPayload(
+                BillingMessage(
+                    newOrder.id!!.toInt(),
+                    price,
+                    paymentInfo.card_number,
+                    paymentInfo.card_expiration,
+                    paymentInfo.card_cvv.toString(),
+                    paymentInfo.card_holder,
+                    username,
+                    jwt
                 )
-                .setHeader(KafkaHeaders.TOPIC, topic)
-                .setHeader("X-Custom-Header", "Custom header here")
-                .build()
-            kafkaTemplate.send(message)
+            )
+            .setHeader(KafkaHeaders.TOPIC, topic)
+            .setHeader("X-Custom-Header", "Custom header here")
+            .build()
+        kafkaTemplate.send(message)
 
-            return newOrder.toDTO()
-        } else {
-            val order = orderRepository.save(Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "FAILURE"))
-            return order.toDTO()
-        }
+        return newOrder.toDTO()
     }
 }

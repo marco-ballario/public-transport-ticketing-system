@@ -28,12 +28,12 @@ INSERT INTO tickets (name, type, duration, zones, price, min_age, max_age)
 VALUES ('Weekend pass', 'Weekend', null, 'ABC', 3.50, null, 27);
 
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (1, 2, 'admin', 'SUCCESS');
+VALUES (1, 2, 'admin', 'SUCCESSFUL');
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (2, 3, 'admin', 'SUCCESS');
+VALUES (2, 3, 'admin', 'SUCCESSFUL');
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (1, 2, 'admin', 'FAILURE');
+VALUES (1, 2, 'admin', 'FAILED');
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (2, 1, 'admin', 'FAILURE');
+VALUES (2, 1, 'admin', 'FAILED');
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (1, 1, 'customer', 'FAILURE');
+VALUES (1, 1, 'customer', 'FAILED');

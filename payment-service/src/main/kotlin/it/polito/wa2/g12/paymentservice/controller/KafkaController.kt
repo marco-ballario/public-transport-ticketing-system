@@ -19,15 +19,12 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/product")
 class KafkaController(
     @Value("\${kafka.topics.bank}") val topicT: String,
-    @Autowired
-    @Qualifier("kafkaTemplateBank")
-    private val kafkaTemplate: KafkaTemplate<String, Any>
+    @Autowired @Qualifier("kafkaTemplateBank") private val kafkaTemplate: KafkaTemplate<String, Any>
 ) {
 
     @PostMapping
     fun post(@RequestBody text: BankMessage): ResponseEntity<Any> {
         return try {
-
             val message: Message<BankMessage> = MessageBuilder
                 .withPayload(text)
                 .setHeader(KafkaHeaders.TOPIC, topicT)

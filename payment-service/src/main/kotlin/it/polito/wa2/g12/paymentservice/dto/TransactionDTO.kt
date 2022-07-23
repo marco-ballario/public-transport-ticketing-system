@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 
 class TransactionDTO(
     val id: Long,
-    val username: String,
     val amount: BigDecimal,
+    val username: String,
     val issuedAt: LocalDateTime,
     val orderId: Int,
     val status: String

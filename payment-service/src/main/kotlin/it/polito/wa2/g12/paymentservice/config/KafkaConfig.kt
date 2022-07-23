@@ -9,12 +9,9 @@ import org.springframework.kafka.core.KafkaAdmin
 
 @Configuration
 class KafkaConfig(
-    @Value("\${kafka.bootstrapAddress}")
-    private val servers: String,
-    @Value("\${kafka.topics.payment}")
-    private val topic: String,
-    @Value("\${kafka.topics.transaction}")
-    private val topicTransaction: String
+    @Value("\${kafka.bootstrapAddress}") private val servers: String,
+    @Value("\${kafka.topics.payment}") private val topic: String,
+    @Value("\${kafka.topics.transaction}") private val topicTransaction: String
 ) {
 
     @Bean
