@@ -179,6 +179,12 @@ class UserServiceImpl : UserService {
         if (!roleRepository.existsByRole(Role.ADMIN)) {
             roleRepository.save(RoleEntity(mutableSetOf<User>(), Role.ADMIN))
         }
+        if (!roleRepository.existsByRole(Role.SUPERADMIN)) {
+            roleRepository.save(RoleEntity(mutableSetOf<User>(), Role.SUPERADMIN))
+        }
+        if (!roleRepository.existsByRole(Role.MACHINE)) {
+            roleRepository.save(RoleEntity(mutableSetOf<User>(), Role.MACHINE))
+        }
         if (!userRepository.existsByNickname("admin")) {
             var admin = User("admin@email.com", "admin", passwordEncoder.encode("admin"), true)
             var roleC = roleRepository.findByRole(Role.CUSTOMER)
@@ -191,6 +197,19 @@ class UserServiceImpl : UserService {
             roleA = roleRepository.save(roleA)
             roleC = roleRepository.save(roleC)
             admin = userRepository.save(admin)
+        }
+        if (!userRepository.existsByNickname("superadmin")) {
+            var superadmin = User("superadmin@email.com", "superadmin", passwordEncoder.encode("superadmin"), true)
+            var roleA = roleRepository.findByRole(Role.ADMIN)
+            var roleSA = roleRepository.findByRole(Role.SUPERADMIN)
+            superadmin = userRepository.save(superadmin)
+            superadmin.roles.add(roleSA!!)
+            superadmin.roles.add(roleA!!)
+            roleSA.users.add(superadmin)
+            roleA.users.add(superadmin)
+            roleA = roleRepository.save(roleA)
+            roleSA = roleRepository.save(roleSA)
+            superadmin = userRepository.save(superadmin)
         }
     }
 }
