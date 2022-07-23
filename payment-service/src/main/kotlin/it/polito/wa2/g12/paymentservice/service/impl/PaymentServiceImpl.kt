@@ -1,13 +1,18 @@
 package it.polito.wa2.g12.paymentservice.service.impl
 
+import it.polito.wa2.g12.paymentservice.dto.DataRangeDTO
 import it.polito.wa2.g12.paymentservice.dto.TransactionDTO
 import it.polito.wa2.g12.paymentservice.entity.toDTO
 import it.polito.wa2.g12.paymentservice.repository.TransactionRepository
 import it.polito.wa2.g12.paymentservice.service.PaymentService
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import it.polito.wa2.g12.paymentservice.service.Report
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.reactive.asFlow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import reactor.kotlin.core.publisher.toMono
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class PaymentServiceImpl : PaymentService {
@@ -20,5 +25,22 @@ class PaymentServiceImpl : PaymentService {
 
     override fun getAllUserTransactions(username: String): Flow<TransactionDTO> {
         return transactionRepository.findAllUserTransactions(username).map { it.toDTO() }
+    }
+
+    override suspend fun getGlobalReport(dataRange: DataRangeDTO): Flow<Report> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val initData = LocalDateTime.parse(dataRange.initialData, formatter)
+        val finalData = LocalDateTime.parse(dataRange.finalData, formatter)
+        val transactionList = transactionRepository.findAllTransactions().filter {
+            it.status == "SUCCESS" &&
+            it.issuedAt.isAfter(initData) &&
+            it.issuedAt.isBefore(finalData)
+        }.map { it.toDTO() }
+        println(transactionList.toList().toString())
+        return Report(
+            transactionList.count(),
+            transactionList.toList().sumOf { it.amount }.toFloat(),
+            0
+            ).toMono().asFlow()
     }
 }
