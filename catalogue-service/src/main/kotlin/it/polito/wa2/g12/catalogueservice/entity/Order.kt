@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("orders")
-class Order(
+data class Order(
     @Column
     var quantity: Int,
     @Column

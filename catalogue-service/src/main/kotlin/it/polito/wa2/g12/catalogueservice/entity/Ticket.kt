@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("ticket_catalogue")
-class Ticket(
+data class Ticket(
     @Column
     var ticket_type: String,
     @Column

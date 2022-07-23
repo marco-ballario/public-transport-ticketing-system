@@ -28,7 +28,6 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.math.absoluteValue
 
-
 @Service
 class catalogueserviceImpl : catalogueservice {
     @Autowired
@@ -43,21 +42,20 @@ class catalogueserviceImpl : catalogueservice {
     @Autowired
     lateinit var kafkaTemplate: KafkaTemplate<String, Any>
 
-
     override fun getAllTickets(): Flow<TicketDTO> {
-        return ticketRepository.findAllTickets().map { it.toDTO() }
+        return ticketRepository.findAll().map { it.toDTO() }
     }
 
     override fun getAllOrders(): Flow<OrderDTO> {
-        return orderRepository.findAllOrders().map { it.toDTO() }
+        return orderRepository.findAll().map { it.toDTO() }
     }
 
     override fun getAllUserOrders(username: String): Flow<OrderDTO> {
-        return orderRepository.findAllUserOrders(username).map { it.toDTO() }
+        return orderRepository.findAllByUsername(username).map { it.toDTO() }
     }
 
     override suspend fun getUserOrder(username: String, orderId: Long): OrderDTO? {
-        return orderRepository.findUserOrderById(username, orderId)?.toDTO()
+        return orderRepository.findByUsernameAndId(username, orderId)?.toDTO()
     }
 
     override suspend fun addNewTicket(t: TicketDTO): TicketDTO? {
