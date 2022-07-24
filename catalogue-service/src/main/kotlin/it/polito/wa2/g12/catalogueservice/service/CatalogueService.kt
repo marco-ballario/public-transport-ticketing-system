@@ -12,4 +12,5 @@ interface CatalogueService {
     suspend fun getUserOrder(username: String, orderId: Long): OrderDTO?
     suspend fun addNewTicket(t: TicketDTO): TicketDTO?
     suspend fun shopTickets(username: String, paymentInfo: PaymentInfoDTO, jwt: String): OrderDTO
+    suspend fun updateTicket(ticketId: Long, updatedTicket: TicketDTO): TicketDTO?
 }

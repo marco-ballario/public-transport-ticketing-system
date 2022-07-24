@@ -133,4 +133,22 @@ class CatalogueServiceImpl : CatalogueService {
 
         return newOrder.toDTO()
     }
+
+    override suspend fun updateTicket(ticketId: Long, updatedTicket: TicketDTO): TicketDTO? {
+        if (updatedTicket.id != null && updatedTicket.id != ticketId)
+            return null
+        if ((updatedTicket.type == TicketType.Daily && updatedTicket.duration == null) ||
+            (updatedTicket.type != TicketType.Daily && updatedTicket.duration != null))
+            return null
+        val newTicket: Ticket = ticketRepository.findById(ticketId) ?: return null
+        newTicket.name = updatedTicket.name
+        newTicket.type = updatedTicket.type.name
+        newTicket.duration = updatedTicket.duration
+        newTicket.zones = updatedTicket.zones
+        newTicket.price = updatedTicket.price
+        newTicket.min_age = updatedTicket.min_age
+        newTicket.max_age = updatedTicket.max_age
+        ticketRepository.save(newTicket)
+        return newTicket.toDTO()
+    }
 }
