@@ -12,12 +12,10 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
 
-
 @EnableKafka
 @Configuration
 class KafkaConsumerConfig(
-    @Value("\${kafka.bootstrapAddress}")
-    private val servers: String
+    @Value("\${kafka.bootstrapAddress}") private val servers: String
 ) {
 
     @Bean
@@ -36,7 +34,7 @@ class KafkaConsumerConfig(
         val factory = ConcurrentKafkaListenerContainerFactory<String, Any>()
         factory.consumerFactory = consumerFactory()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.isSyncCommits = true;
+        factory.containerProperties.isSyncCommits = true
         return factory
     }
 }

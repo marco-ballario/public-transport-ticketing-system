@@ -1,7 +1,5 @@
 package it.polito.wa2.g12.paymentservice.kafka
 
-import it.polito.wa2.g12.catalogueservice.kafka.BillingMessage
-import it.polito.wa2.g12.catalogueservice.kafka.TransactionMessage
 import it.polito.wa2.g12.paymentservice.entity.Transaction
 import it.polito.wa2.g12.paymentservice.repository.TransactionRepository
 import kotlinx.coroutines.reactor.mono
@@ -48,10 +46,10 @@ class Consumer {
         mono {
             transactionRepository.save(
                 Transaction(
-                    billingMessage.order_id,
-                    billingMessage.username,
                     billingMessage.price,
+                    billingMessage.username,
                     LocalDateTime.now(),
+                    billingMessage.order_id,
                     "PENDING"
                 )
             )
@@ -74,7 +72,6 @@ class Consumer {
             kafkaTemplateBank.send(message)
             ack.acknowledge()
         }
-
     }
 
     @KafkaListener(
@@ -107,6 +104,5 @@ class Consumer {
                 ack.acknowledge()
             }
         }
-
     }
 }

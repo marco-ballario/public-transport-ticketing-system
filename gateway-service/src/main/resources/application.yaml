@@ -17,7 +17,7 @@ spring:
         - id: catalogue-service
           uri: lb://catalogue-service
           predicates:
-            - Path=/tickets, /orders/**, /admin/orders/**, /admin/tickets, /shop
+            - Path=/tickets, /orders/**, /admin/orders/**, /admin/tickets/**, /shop
         - id: payment-service
           uri: lb://payment-service
           predicates:

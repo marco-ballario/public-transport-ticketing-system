@@ -22,12 +22,12 @@ class TicketPurchased(
     @Temporal(value = TemporalType.TIMESTAMP)
     var deadline: Date = java.sql.Timestamp.valueOf(LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS))
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     @Temporal(value = TemporalType.TIMESTAMP)
-    var validFrom: Date? = null
+    var validFrom: Date = java.sql.Timestamp.valueOf(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
 
-    @Column(nullable = true)
-    var type: String? = null
+    @Column(nullable = false)
+    var type: String = "Daily"
 }
 
 fun TicketPurchased.toDTO(ticketId: Long?, jws: String) =
@@ -40,6 +40,6 @@ fun TicketPurchased.toExtendedDTO(ticketId: Long?, jws: String) =
         validFrom.toString(),
         deadline.toString(),
         zone,
-        type!!,
+        type,
         jws
     )
