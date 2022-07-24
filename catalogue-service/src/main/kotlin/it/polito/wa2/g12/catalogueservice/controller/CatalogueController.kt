@@ -59,6 +59,16 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
     }
 
     // Use a JSON like this one to test this endpoint:
+    // {"name":"Super ticket","type":"Daily","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
+    @PutMapping("/admin/tickets/{ticketId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    suspend fun updateTicket(@PathVariable ticketId: Long, @RequestBody ticket: TicketDTO): ResponseEntity<TicketDTO?> {
+        val newTicket = catalogueService.updateTicket(ticketId, ticket)
+        return if (newTicket == null) ResponseEntity(null, HttpStatus.UNPROCESSABLE_ENTITY)
+        else return ResponseEntity(newTicket, HttpStatus.OK)
+    }
+
+    // Use a JSON like this one to test this endpoint:
     // {"ticket_id":1,"quantity":1,"card_number":"1111222233334444","card_expiration":"01/25","card_cvv":"123","card_holder":"admin"}
     // All the JSON fields are needed
     @PostMapping("/shop")
@@ -73,15 +83,5 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
             paymentInfo,
             authorizationHeader
         )
-    }
-
-    // Use a JSON like this one to test this endpoint:
-    // {"name":"Super ticket","type":"Daily","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
-    @PutMapping("/admin/tickets/{ticketId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    suspend fun updateTicket(@PathVariable ticketId: Long, @RequestBody ticket: TicketDTO): ResponseEntity<TicketDTO?> {
-        val newTicket = catalogueService.updateTicket(ticketId, ticket)
-        return if (newTicket == null) ResponseEntity(null, HttpStatus.UNPROCESSABLE_ENTITY)
-        else return ResponseEntity(newTicket, HttpStatus.OK)
     }
 }
