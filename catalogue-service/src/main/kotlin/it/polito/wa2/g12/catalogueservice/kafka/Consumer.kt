@@ -67,7 +67,7 @@ class Consumer {
                 orderRepository.save(order)
                 acquiredTickets
             }.subscribe {
-                // print tickets acquired for debug purposes
+                // Prints tickets acquired for debug purposes
                 println(it)
                 ack.acknowledge()
             }

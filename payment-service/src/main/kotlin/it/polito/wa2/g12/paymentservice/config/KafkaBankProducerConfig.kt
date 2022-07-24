@@ -14,6 +14,7 @@ import org.springframework.kafka.core.ProducerFactory
 class KafkaBankProducerConfig(
     @Value("\${kafka.bootstrapAddress}") private val servers: String
 ) {
+
     @Bean
     fun producerFactoryBank(): ProducerFactory<String, Any> {
         val configProps: MutableMap<String, Any> = HashMap()

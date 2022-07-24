@@ -9,6 +9,7 @@ import it.polito.wa2.g12.travelerservice.entities.TicketPurchased
 import it.polito.wa2.g12.travelerservice.entities.UserDetails
 import it.polito.wa2.g12.travelerservice.entities.toDTO
 import it.polito.wa2.g12.travelerservice.entities.toExtendedDTO
+import it.polito.wa2.g12.travelerservice.enum.TicketType
 import it.polito.wa2.g12.travelerservice.repositories.TicketPurchasedRepository
 import it.polito.wa2.g12.travelerservice.repositories.UserDetailsRepository
 import it.polito.wa2.g12.travelerservice.service.TravelerService
@@ -18,9 +19,11 @@ import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters.*
 import java.util.*
 import javax.annotation.PostConstruct
 import javax.crypto.SecretKey
+
 
 @Service
 class TravelerServiceImpl : TravelerService {
@@ -65,18 +68,19 @@ class TravelerServiceImpl : TravelerService {
     }
 
     private fun getTicketList(tickets: List<String>): MutableList<AcquiredTicketDTO> {
+        // 0=id, 1=issuedAt, 2=deadline, 3=zone, 4=userDet.id, 5=validFrom, 6=type
         val ticketList: MutableList<AcquiredTicketDTO> = mutableListOf()
         tickets.forEach { t ->
             val parts = t.split(",")
             val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-            val exp = formatter.parse(parts[2]).time
-            val iat = formatter.parse(parts[1]).time
-            val validfrom = formatter.parse(parts[5]).time
+            val exp: Date = formatter.parse(parts[2])
+            val iat: Date = formatter.parse(parts[1])
+            val validfrom: Date = formatter.parse(parts[5])
 
             val claims = mapOf<String, Any>(
                 "sub" to parts[0].toLong(),
                 "iat" to iat,
-                "validfrom" to validfrom,
+                "nbf" to validfrom,
                 "exp" to exp,
                 "zid" to parts[3],
                 "type" to parts[6],
@@ -114,8 +118,8 @@ class TravelerServiceImpl : TravelerService {
             while (x > 0) {
                 var newTicket = TicketPurchased(zone, user)
                 newTicket = ticketsRepo.save(newTicket)
-                val exp = newTicket.deadline.time
-                val iat = newTicket.issuedAt.time
+                val exp = newTicket.deadline
+                val iat = newTicket.issuedAt
                 val claims =
                     mapOf<String, Any>("sub" to newTicket.getId()!!, "exp" to exp, "vz" to newTicket.zone, "iat" to iat)
                 val jws = Jwts.builder().setClaims(claims).signWith(secretKey).compact()
@@ -137,6 +141,7 @@ class TravelerServiceImpl : TravelerService {
         if (user.isEmpty)
             return null
 
+        var calendar = Calendar.getInstance()
         val acquiredTickets = mutableListOf<AcquiredTicketDTO>()
 
         for (i in 1..ticketsToAcquire.quantity) {
@@ -146,25 +151,46 @@ class TravelerServiceImpl : TravelerService {
             t.type = ticketsToAcquire.type
             t.issuedAt = java.sql.Timestamp.valueOf(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
 
-            if (ticketsToAcquire.only_weekends) {
-                val saturday = LocalDateTime.now().with(DayOfWeek.SATURDAY).truncatedTo(ChronoUnit.SECONDS)
-                t.validFrom = java.sql.Timestamp.valueOf(saturday)
-                t.deadline = java.sql.Timestamp.valueOf(saturday.plusHours(ticketsToAcquire.duration.toLong()))
-            } else {
-                val now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-                t.validFrom = java.sql.Timestamp.valueOf(now)
-                t.deadline = java.sql.Timestamp.valueOf(now.plusHours(ticketsToAcquire.duration.toLong()))
+            when (TicketType.values().find { it.name == ticketsToAcquire.type }!!) {
+                TicketType.Daily -> {
+                    val now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
+                    t.validFrom = java.sql.Timestamp.valueOf(now)
+                    t.deadline = java.sql.Timestamp.valueOf(now.plusHours(ticketsToAcquire.duration.toLong()))
+                }
+                TicketType.Weekend -> {
+                    val saturday = LocalDateTime.now().with(DayOfWeek.SATURDAY).truncatedTo(ChronoUnit.SECONDS)
+                    t.validFrom = resetTime(calendar, java.sql.Timestamp.valueOf(saturday))
+                    t.deadline = resetTime(calendar, java.sql.Timestamp.valueOf(saturday.plusHours(24 * 2)))
+                }
+                TicketType.Weekly -> {
+                    val monday = LocalDateTime.now().with(DayOfWeek.MONDAY).truncatedTo(ChronoUnit.SECONDS)
+                    t.validFrom = resetTime(calendar, java.sql.Timestamp.valueOf(monday))
+                    t.deadline = resetTime(calendar, java.sql.Timestamp.valueOf(monday.plusHours(24 * 7)))
+                }
+                TicketType.Monthly -> {
+                    val firstDay = LocalDateTime.now().with(firstDayOfMonth()).truncatedTo(ChronoUnit.SECONDS)
+                    val lastDay = LocalDateTime.now().with(lastDayOfMonth()).truncatedTo(ChronoUnit.SECONDS)
+                    t.validFrom = resetTime(calendar, java.sql.Timestamp.valueOf(firstDay))
+                    t.deadline = resetTime(calendar, java.sql.Timestamp.valueOf(lastDay.plusHours(24)))
+                }
+                TicketType.Yearly -> {
+                    val firstDay = LocalDateTime.now().with(firstDayOfYear()).truncatedTo(ChronoUnit.SECONDS)
+                    val lastDay = LocalDateTime.now().with(lastDayOfYear()).truncatedTo(ChronoUnit.SECONDS)
+                    t.validFrom = resetTime(calendar, java.sql.Timestamp.valueOf(firstDay))
+                    t.deadline = resetTime(calendar, java.sql.Timestamp.valueOf(lastDay.plusHours(24)))
+                }
             }
-
+            println("AIUTO")
+            println(t.validFrom)
             // Saves the tickets
             val newTicket = ticketsRepo.save(t)
 
             // Generates JWS
             val claims = mapOf<String, Any>(
                 "sub" to newTicket.getId()!!,
-                "iat" to newTicket.issuedAt.time,
-                "validfrom" to newTicket.validFrom!!.time,
-                "exp" to newTicket.deadline.time,
+                "iat" to newTicket.issuedAt,
+                "nbf" to newTicket.validFrom,
+                "exp" to newTicket.deadline,
                 "zid" to newTicket.zone,
                 "type" to newTicket.type!!,
             )
@@ -173,6 +199,15 @@ class TravelerServiceImpl : TravelerService {
         }
 
         return acquiredTickets
+    }
+
+    private fun resetTime(calendar: Calendar, date: Date): Date {
+        calendar.time = date
+        calendar[Calendar.HOUR_OF_DAY] = 0
+        calendar[Calendar.MINUTE] = 0
+        calendar[Calendar.SECOND] = 0
+        calendar[Calendar.MILLISECOND] = 0
+        return calendar.time
     }
 
     // Creates a default record in the db
