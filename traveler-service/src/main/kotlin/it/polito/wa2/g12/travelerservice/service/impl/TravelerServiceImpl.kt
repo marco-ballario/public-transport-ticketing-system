@@ -70,9 +70,10 @@ class TravelerServiceImpl : TravelerService {
     private fun getTicketList(tickets: List<String>): MutableList<AcquiredTicketDTO> {
         // 0=id, 1=issuedAt, 2=deadline, 3=zone, 4=userDet.id, 5=validFrom, 6=type
         val ticketList: MutableList<AcquiredTicketDTO> = mutableListOf()
+        val calendar = Calendar.getInstance()
         tickets.forEach { t ->
             val parts = t.split(",")
-            val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+            val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
             val exp: Date = formatter.parse(parts[2])
             val iat: Date = formatter.parse(parts[1])
             val validfrom: Date = formatter.parse(parts[5])
@@ -86,7 +87,16 @@ class TravelerServiceImpl : TravelerService {
                 "type" to parts[6],
             )
             val jws = Jwts.builder().setClaims(claims).signWith(secretKey).compact()
-            ticketList.add(AcquiredTicketDTO(parts[0].toLong(), parts[1], parts[5], parts[2], parts[3], parts[6], jws))
+            ticketList.add(
+                AcquiredTicketDTO(
+                    parts[0].toLong(),
+                    parts[1].substring(0, parts[1].length -2),
+                    parts[5].substring(0, parts[5].length -2),
+                    parts[2].substring(0, parts[2].length -2),
+                    parts[3],
+                    parts[6],
+                    jws)
+            )
         }
         return ticketList
     }
@@ -123,7 +133,12 @@ class TravelerServiceImpl : TravelerService {
                 val claims =
                     mapOf<String, Any>("sub" to newTicket.getId()!!, "exp" to exp, "vz" to newTicket.zone, "iat" to iat)
                 val jws = Jwts.builder().setClaims(claims).signWith(secretKey).compact()
-                newTickets.add(newTicket.toDTO(newTicket.getId(), jws))
+
+                val newTicketDTO = newTicket.toDTO(newTicket.getId(), jws)
+                newTicketDTO.iat = newTicketDTO.iat.substring(0, newTicketDTO.iat.length -2)
+                newTicketDTO.exp = newTicketDTO.exp.substring(0, newTicketDTO.exp.length -2)
+                newTickets.add(newTicketDTO)
+                newTicket
                 x--
             }
             newTickets
@@ -141,7 +156,7 @@ class TravelerServiceImpl : TravelerService {
         if (user.isEmpty)
             return null
 
-        var calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance()
         val acquiredTickets = mutableListOf<AcquiredTicketDTO>()
 
         for (i in 1..ticketsToAcquire.quantity) {
@@ -180,8 +195,7 @@ class TravelerServiceImpl : TravelerService {
                     t.deadline = resetTime(calendar, java.sql.Timestamp.valueOf(lastDay.plusHours(24)))
                 }
             }
-            println("AIUTO")
-            println(t.validFrom)
+
             // Saves the tickets
             val newTicket = ticketsRepo.save(t)
 
@@ -201,6 +215,7 @@ class TravelerServiceImpl : TravelerService {
         return acquiredTickets
     }
 
+    // Resets the time part of a Date object to zero
     private fun resetTime(calendar: Calendar, date: Date): Date {
         calendar.time = date
         calendar[Calendar.HOUR_OF_DAY] = 0

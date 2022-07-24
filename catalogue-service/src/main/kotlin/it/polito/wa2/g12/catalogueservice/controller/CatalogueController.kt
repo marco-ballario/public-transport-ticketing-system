@@ -58,6 +58,9 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
         else return ResponseEntity(newTicket, HttpStatus.OK)
     }
 
+    // Use a JSON like this one to test this endpoint:
+    // {"ticket_id":1,"quantity":1,"card_number":"1111222233334444","card_expiration":"01/25","card_cvv":"123","card_holder":"admin"}
+    // All the JSON fields are needed
     @PostMapping("/shop")
     @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
     suspend fun shopTickets(

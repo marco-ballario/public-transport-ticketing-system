@@ -92,7 +92,7 @@ class CatalogueServiceImpl : CatalogueService {
              return orderRepository.save(
                 Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "FAILED")
             ).toDTO()
-        println("SONO QUI!1")
+
         // Gets profile information about the purchaser
         val response: UserProfileDTO = WebClient
             .create("http://localhost:8082")
@@ -108,7 +108,7 @@ class CatalogueServiceImpl : CatalogueService {
                 Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "FAILED")
             ).toDTO()
         }
-        println("SONO QUI!2")
+
         var newOrder = Order(paymentInfo.ticket_id, paymentInfo.quantity, username, "PENDING")
         newOrder = orderRepository.save(newOrder)
         val price = BigDecimal.valueOf(paymentInfo.quantity * ticket.price)
@@ -130,7 +130,7 @@ class CatalogueServiceImpl : CatalogueService {
             .setHeader("X-Custom-Header", "Custom header here")
             .build()
         kafkaTemplate.send(message)
-        println("SONO QUI!3")
+
         return newOrder.toDTO()
     }
 }
