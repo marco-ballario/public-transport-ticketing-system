@@ -10,18 +10,38 @@ spring:
           uri: lb://login-service
           predicates:
             - Path=/user/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: login-service-circuit-breaker
+                fallbackUri: forward:/fallback
         - id: traveler-service
           uri: lb://traveler-service
           predicates:
             - Path=/admin/travelers, /admin/traveler/**, /my/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: traveler-service-circuit-breaker
+                fallbackUri: forward:/fallback
         - id: catalogue-service
           uri: lb://catalogue-service
           predicates:
             - Path=/tickets, /orders/**, /admin/orders/**, /admin/tickets/**, /shop
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: catalogue-service-circuit-breaker
+                fallbackUri: forward:/fallback
         - id: payment-service
           uri: lb://payment-service
           predicates:
             - Path=/product, /transactions, /admin/transactions
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: payment-service-circuit-breaker
+                fallbackUri: forward:/fallback
 eureka:
   instance:
     preferIpAddress: true
