@@ -26,11 +26,22 @@ class PaymentController(val paymentService: PaymentServiceImpl) {
         return paymentService.getAllTransactions()
     }
 
-    @PostMapping("/report")
+    @PostMapping("/global_report")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun globalReport(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: DataRangeDTO
     ): Flow<Report> {
         return paymentService.getGlobalReport(dataRange)
+    }
+
+    @PostMapping("/report/{username}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    suspend fun userReport(
+        @RequestHeader("Authorization") authorizationHeader: String,
+        @RequestBody dataRange: DataRangeDTO,
+        @PathVariable username: String
+    ): Flow<Report> {
+        return paymentService.getUserReport(dataRange, username)
     }
 }

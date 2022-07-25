@@ -14,4 +14,5 @@ interface PaymentService {
     fun getAllTransactions(): Flow<TransactionDTO>
     fun getAllUserTransactions(username: String): Flow<TransactionDTO>
     suspend fun getGlobalReport(dataRange: DataRangeDTO): Flow<Report>
+    suspend fun getUserReport(dataRange: DataRangeDTO, username: String): Flow<Report>
 }

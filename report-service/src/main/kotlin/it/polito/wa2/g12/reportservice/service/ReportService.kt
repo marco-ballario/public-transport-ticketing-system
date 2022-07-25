@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReportService {
     suspend fun getGlobalReport(jwt: String, dataRange: DataRangeDTO): Flow<String>
+    suspend fun getUserReport(jwt: String, dataRange: DataRangeDTO, username: String): Flow<String>
 }

@@ -19,6 +19,8 @@ class PaymentServiceImpl : PaymentService {
     @Autowired
     lateinit var transactionRepository: TransactionRepository
 
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
     override fun getAllTransactions(): Flow<TransactionDTO> {
         return transactionRepository.findAllTransactions().map { it.toDTO() }
     }
@@ -28,7 +30,6 @@ class PaymentServiceImpl : PaymentService {
     }
 
     override suspend fun getGlobalReport(dataRange: DataRangeDTO): Flow<Report> {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val initData = LocalDateTime.parse(dataRange.initialData, formatter)
         val finalData = LocalDateTime.parse(dataRange.finalData, formatter)
         val transactionList = transactionRepository.findAllTransactions().filter {
@@ -41,5 +42,21 @@ class PaymentServiceImpl : PaymentService {
             transactionList.toList().sumOf { it.amount }.toFloat(),
             0
             ).toMono().asFlow()
+    }
+
+    override suspend fun getUserReport(dataRange: DataRangeDTO, username: String): Flow<Report> {
+        val initData = LocalDateTime.parse(dataRange.initialData, formatter)
+        val finalData = LocalDateTime.parse(dataRange.finalData, formatter)
+        val transactionList = transactionRepository.findAllTransactions().filter {
+            it.username == username &&
+            it.status == "SUCCESS" &&
+            it.issuedAt.isAfter(initData) &&
+            it.issuedAt.isBefore(finalData)
+        }.map { it.toDTO() }
+        return Report(
+            transactionList.count(),
+            transactionList.toList().sumOf { it.amount }.toFloat(),
+            0
+        ).toMono().asFlow()
     }
 }
