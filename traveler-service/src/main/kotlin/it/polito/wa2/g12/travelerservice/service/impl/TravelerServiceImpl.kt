@@ -167,7 +167,7 @@ class TravelerServiceImpl : TravelerService {
             t.issuedAt = java.sql.Timestamp.valueOf(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
 
             when (TicketType.values().find { it.name == ticketsToAcquire.type }!!) {
-                TicketType.Daily -> {
+                TicketType.Ordinary -> {
                     val now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
                     t.validFrom = java.sql.Timestamp.valueOf(now)
                     t.deadline = java.sql.Timestamp.valueOf(now.plusHours(ticketsToAcquire.duration.toLong()))

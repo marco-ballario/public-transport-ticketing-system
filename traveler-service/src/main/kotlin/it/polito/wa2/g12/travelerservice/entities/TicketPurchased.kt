@@ -27,7 +27,7 @@ class TicketPurchased(
     var validFrom: Date = java.sql.Timestamp.valueOf(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
 
     @Column(nullable = false)
-    var type: String = "Daily"
+    var type: String = "Ordinary"
 }
 
 fun TicketPurchased.toDTO(ticketId: Long?, jws: String) =

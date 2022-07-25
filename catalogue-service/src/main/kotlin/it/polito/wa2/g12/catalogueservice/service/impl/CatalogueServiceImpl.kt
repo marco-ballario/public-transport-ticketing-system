@@ -60,11 +60,11 @@ class CatalogueServiceImpl : CatalogueService {
     }
 
     override suspend fun addNewTicket(t: TicketDTO): TicketDTO? {
-        // Only daily tickets have the duration set in hours
+        // Only ordinary tickets have the duration set in hours
         // The other types of tickets have the duration set to null
         // The duration is the validity time of the ticket after being validated
-        if ((t.type == TicketType.Daily && t.duration == null) ||
-            (t.type != TicketType.Daily && t.duration != null))
+        if ((t.type == TicketType.Ordinary && t.duration == null) ||
+            (t.type != TicketType.Ordinary && t.duration != null))
             return null
 
         return ticketRepository.save(
@@ -137,8 +137,8 @@ class CatalogueServiceImpl : CatalogueService {
     override suspend fun updateTicket(ticketId: Long, updatedTicket: TicketDTO): TicketDTO? {
         if (updatedTicket.id != null && updatedTicket.id != ticketId)
             return null
-        if ((updatedTicket.type == TicketType.Daily && updatedTicket.duration == null) ||
-            (updatedTicket.type != TicketType.Daily && updatedTicket.duration != null))
+        if ((updatedTicket.type == TicketType.Ordinary && updatedTicket.duration == null) ||
+            (updatedTicket.type != TicketType.Ordinary && updatedTicket.duration != null))
             return null
         val newTicket: Ticket = ticketRepository.findById(ticketId) ?: return null
         newTicket.name = updatedTicket.name

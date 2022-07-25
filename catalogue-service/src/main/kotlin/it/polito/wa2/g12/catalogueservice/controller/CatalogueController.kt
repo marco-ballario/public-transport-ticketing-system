@@ -45,21 +45,21 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
     }
 
     // Use a JSON like this one to test this endpoint:
-    // {"name":"Super ticket","type":"Daily","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
+    // {"name":"Super ticket","type":"Ordinary","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
     @PostMapping("/admin/tickets")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun addNewTicket(@RequestBody ticket: TicketDTO): ResponseEntity<TicketDTO?> {
         val newTicket = catalogueService.addNewTicket(ticket)
         // In case the information provided are incorrect no ticket will be added
         // The information provided are incorrect when in 2 cases:
-        // 1) When a provided daily ticket does not have a duration set
-        // 2) When a not-daily ticket has the duration set
+        // 1) When a provided ordinary ticket does not have a duration set
+        // 2) When a not-ordinary ticket has the duration set
         return if (newTicket == null) ResponseEntity(null, HttpStatus.UNPROCESSABLE_ENTITY)
         else return ResponseEntity(newTicket, HttpStatus.OK)
     }
 
     // Use a JSON like this one to test this endpoint:
-    // {"name":"Super ticket","type":"Daily","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
+    // {"name":"Super ticket","type":"Ordinary","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
     @PutMapping("/admin/tickets/{ticketId}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun updateTicket(@PathVariable ticketId: Long, @RequestBody ticket: TicketDTO): ResponseEntity<TicketDTO?> {

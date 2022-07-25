@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS orders
 );
 
 INSERT INTO tickets (name, type, duration, zones, price, min_age, max_age)
-VALUES ('Ordinal ticket', 'Daily', 1, 'ABC', 2.50, null, null);
+VALUES ('Ordinal ticket', 'Ordinary', 1, 'ABC', 2.50, null, null);
 INSERT INTO tickets (name, type, duration, zones, price, min_age, max_age)
 VALUES ('Weekend pass', 'Weekend', null, 'DEF', 3.50, null, 27);
 INSERT INTO tickets (name, type, duration, zones, price, min_age, max_age)
