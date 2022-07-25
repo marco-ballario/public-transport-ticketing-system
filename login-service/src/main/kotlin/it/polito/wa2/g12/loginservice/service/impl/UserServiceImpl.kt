@@ -1,10 +1,7 @@
 package it.polito.wa2.g12.loginservice.service.impl
 
 import io.jsonwebtoken.Jwts
-import it.polito.wa2.g12.loginservice.dto.ActivationDTO
-import it.polito.wa2.g12.loginservice.dto.RegistrationDTO
-import it.polito.wa2.g12.loginservice.dto.TokenDTO
-import it.polito.wa2.g12.loginservice.dto.UserDTO
+import it.polito.wa2.g12.loginservice.dto.*
 import it.polito.wa2.g12.loginservice.entity.Activation
 import it.polito.wa2.g12.loginservice.entity.RoleEntity
 import it.polito.wa2.g12.loginservice.entity.User
@@ -169,6 +166,20 @@ class UserServiceImpl : UserService {
             return Jwts.builder().setClaims(claims).signWith(secretKey).compact()
         }
         return null
+    }
+
+    override fun adminReg(admin: AdminDTO): UserDTO? {
+        if(userRepository.existsByNickname(admin.email)||userRepository.existsByNickname(admin.username))
+            return null
+        val password = passwordEncoder.encode(admin.password)
+        var role = roleRepository.findByRole(admin.role)
+        var user = User(admin.email,admin.username,password,true, mutableSetOf())
+        user = userRepository.save(user)
+        user.roles.add(role!!)
+        role.users.add(user)
+        roleRepository.save(role)
+        userRepository.save(user)
+        return user.toDTO()
     }
 
     @PostConstruct
