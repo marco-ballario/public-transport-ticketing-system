@@ -20,8 +20,8 @@ class ReportServiceImpl : ReportService {
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     override suspend fun getGlobalReport(dataRange: TimePeriodDTO): ReportDTO {
-        val transactionList = transactionRepository.findAllTransactions().filter {
-            it.status == "SUCCESS" &&
+        val transactionList = transactionRepository.findAll().filter {
+            it.status == "SUCCESSFUL" &&
             it.issuedAt.isAfter(LocalDateTime.parse(dataRange.start_date, formatter)) &&
             it.issuedAt.isBefore(LocalDateTime.parse(dataRange.end_date, formatter))
         }.map { it.toDTO() }
@@ -33,9 +33,9 @@ class ReportServiceImpl : ReportService {
     }
 
     override suspend fun getUserReport(dataRange: TimePeriodDTO, username: String): ReportDTO {
-        val transactionList = transactionRepository.findAllTransactions().filter {
+        val transactionList = transactionRepository.findAll().filter {
             it.username == username &&
-            it.status == "SUCCESS" &&
+            it.status == "SUCCESSFUL" &&
             it.issuedAt.isAfter(LocalDateTime.parse(dataRange.start_date, formatter)) &&
             it.issuedAt.isBefore(LocalDateTime.parse(dataRange.end_date, formatter))
         }.map { it.toDTO() }
