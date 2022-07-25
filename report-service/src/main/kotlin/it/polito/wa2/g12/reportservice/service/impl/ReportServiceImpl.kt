@@ -1,7 +1,8 @@
 package it.polito.wa2.g12.reportservice.service.impl
 
+import it.polito.wa2.g12.reportservice.dto.GlobalReportDTO
 import it.polito.wa2.g12.reportservice.dto.TimePeriodDTO
-import it.polito.wa2.g12.reportservice.dto.ReportDTO
+import it.polito.wa2.g12.reportservice.dto.UserReportDTO
 import it.polito.wa2.g12.reportservice.service.ReportService
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -11,7 +12,7 @@ import org.springframework.web.reactive.function.client.awaitBody
 @Service
 class ReportServiceImpl : ReportService {
 
-    override suspend fun getGlobalReport(jwt: String, dataRange: TimePeriodDTO): ReportDTO {
+    override suspend fun getGlobalReport(jwt: String, dataRange: TimePeriodDTO): GlobalReportDTO {
         return WebClient
             .create("http://localhost:8084")
             .post()
@@ -23,7 +24,7 @@ class ReportServiceImpl : ReportService {
             .awaitBody()
     }
 
-    override suspend fun getUserReport(jwt: String, dataRange: TimePeriodDTO, username: String): ReportDTO {
+    override suspend fun getUserReport(jwt: String, dataRange: TimePeriodDTO, username: String): UserReportDTO {
         return WebClient
             .create("http://localhost:8084")
             .post()

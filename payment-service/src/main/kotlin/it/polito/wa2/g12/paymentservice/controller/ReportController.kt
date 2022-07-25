@@ -1,7 +1,8 @@
 package it.polito.wa2.g12.paymentservice.controller
 
+import it.polito.wa2.g12.paymentservice.dto.GlobalReportDTO
 import it.polito.wa2.g12.paymentservice.dto.TimePeriodDTO
-import it.polito.wa2.g12.paymentservice.dto.ReportDTO
+import it.polito.wa2.g12.paymentservice.dto.UserReportDTO
 import it.polito.wa2.g12.paymentservice.service.impl.ReportServiceImpl
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -14,16 +15,22 @@ class ReportController(val reportService: ReportServiceImpl) {
 
     @PostMapping("/report")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    suspend fun globalReport(@RequestBody dataRange: TimePeriodDTO): ReportDTO {
-        return reportService.getGlobalReport(dataRange)
+    suspend fun globalReport(
+        @RequestHeader("Authorization") authorizationHeader: String,
+        @RequestBody dataRange: TimePeriodDTO
+    ): GlobalReportDTO {
+        val res = reportService.getGlobalReport(dataRange, authorizationHeader)
+        println(res)
+        return res
     }
 
     @PostMapping("/report/{username}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun userReport(
+        @RequestHeader("Authorization") authorizationHeader: String,
         @PathVariable username: String,
         @RequestBody dataRange: TimePeriodDTO
-    ): ReportDTO {
-        return reportService.getUserReport(dataRange, username)
+    ): UserReportDTO {
+        return reportService.getUserReport(dataRange, username, authorizationHeader)
     }
 }
