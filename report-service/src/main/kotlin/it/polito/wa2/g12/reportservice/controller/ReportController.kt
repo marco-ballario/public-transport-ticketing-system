@@ -18,7 +18,6 @@ class ReportController(val reportService: ReportServiceImpl) {
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: TimePeriodDTO
     ): ReportDTO {
-        println("ciao")
         return reportService.getGlobalReport(authorizationHeader, dataRange)
     }
 
@@ -29,7 +28,6 @@ class ReportController(val reportService: ReportServiceImpl) {
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: TimePeriodDTO
     ): ReportDTO {
-        println("ciao")
         return reportService.getUserReport(authorizationHeader, dataRange, username)
     }
 }
