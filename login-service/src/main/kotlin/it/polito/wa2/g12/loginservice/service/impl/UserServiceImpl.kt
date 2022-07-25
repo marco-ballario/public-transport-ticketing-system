@@ -211,5 +211,16 @@ class UserServiceImpl : UserService {
             roleSA = roleRepository.save(roleSA)
             superadmin = userRepository.save(superadmin)
         }
+
+        //insert machine
+        if (!userRepository.existsByNickname("machine")) {
+            var machine = User("machine@email.com", "machine", passwordEncoder.encode("machine"), true)
+            var roleA = roleRepository.findByRole(Role.MACHINE)
+            machine = userRepository.save(machine)
+            machine.roles.add(roleA!!)
+            roleA.users.add(machine)
+            roleA = roleRepository.save(roleA)
+            machine = userRepository.save(machine)
+        }
     }
 }

@@ -1,6 +1,10 @@
 package it.polito.wa2.g12.travelerservice.controller
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource
+import com.google.zxing.common.HybridBinarizer
 import it.polito.wa2.g12.travelerservice.dto.AcquiredTicketDTO
 import it.polito.wa2.g12.travelerservice.dto.TicketDTO
 import it.polito.wa2.g12.travelerservice.dto.TicketsToAcquireDTO
@@ -11,7 +15,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
+import java.io.ByteArrayInputStream
 import java.security.Principal
+import java.util.*
+import javax.imageio.ImageIO
+
 
 @RestController
 @RequestMapping("/my")
@@ -87,4 +95,13 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
         val tickets = travelerService.acquireTickets(acquiredTickets) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
         return ResponseEntity(tickets, HttpStatus.OK)
     }
+
+    // Get QrCode for ticket with id
+    @GetMapping("/QRCode/{tid}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    fun getQRCode(principal: Principal,@PathVariable(value="tid") ticketId:Long): ResponseEntity<Any> {
+        val res = travelerService.getQRCode(ticketId)
+        return ResponseEntity(res, HttpStatus.OK)
+    }
+
 }

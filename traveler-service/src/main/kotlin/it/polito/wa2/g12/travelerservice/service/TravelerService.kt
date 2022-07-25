@@ -14,4 +14,5 @@ interface TravelerService {
     fun createUserTickets(name: String, quantity: Int, zone: String): List<TicketDTO>?
     fun getTravelers(): List<String>
     fun acquireTickets(ticketsToAcquire: TicketsToAcquireDTO): List<AcquiredTicketDTO>?
+    fun getQRCode(ticketId: Long): String
 }

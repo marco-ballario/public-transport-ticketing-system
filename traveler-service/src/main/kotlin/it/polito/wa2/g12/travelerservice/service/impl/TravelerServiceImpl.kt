@@ -1,5 +1,8 @@
 package it.polito.wa2.g12.travelerservice.service.impl
 
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.google.zxing.client.j2se.MatrixToImageWriter
 import io.jsonwebtoken.Jwts
 import it.polito.wa2.g12.travelerservice.dto.AcquiredTicketDTO
 import it.polito.wa2.g12.travelerservice.dto.TicketDTO
@@ -14,6 +17,7 @@ import it.polito.wa2.g12.travelerservice.repositories.UserDetailsRepository
 import it.polito.wa2.g12.travelerservice.service.TravelerService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalDateTime
@@ -173,6 +177,23 @@ class TravelerServiceImpl : TravelerService {
         }
 
         return acquiredTickets
+    }
+
+    override fun getQRCode(ticketId: Long) : String{
+        val ticket = ticketsRepo.findById(ticketId).get()
+        //generate jws
+        val exp = ticket.deadline.time
+        val iat = ticket.issuedAt.time
+        val claims =
+            mapOf<String, Any>("sub" to ticket.getId()!!, "exp" to exp, "vz" to ticket.zone, "iat" to iat)
+        val jws = Jwts.builder().setClaims(claims).signWith(secretKey).compact()
+        //val qr = Encoder.encode(jws,ErrorCorrectionLevel.M)
+        val qr = MultiFormatWriter().encode(jws, BarcodeFormat.QR_CODE,50,50)
+        val bos = ByteArrayOutputStream()
+        MatrixToImageWriter.writeToStream(qr,"png",bos)
+        val image = Base64.getEncoder().encodeToString(bos.toByteArray())
+        return image
+
     }
 
     // Creates a default record in the db
