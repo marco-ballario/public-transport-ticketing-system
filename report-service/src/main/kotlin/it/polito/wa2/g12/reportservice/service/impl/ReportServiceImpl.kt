@@ -12,6 +12,7 @@ import reactor.kotlin.core.publisher.toMono
 
 @Service
 class ReportServiceImpl : ReportService {
+
     override suspend fun getGlobalReport(jwt: String, dataRange: DataRangeDTO): Flow<String> {
         val response : String = WebClient
             .create("http://localhost:8084")

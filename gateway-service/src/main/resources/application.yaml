@@ -22,6 +22,10 @@ spring:
           uri: lb://payment-service
           predicates:
             - Path=/product, /transactions, /admin/transactions
+        - id: report-service
+          uri: lb://report-service
+          predicates:
+            - Path=/report/**
 eureka:
   instance:
     preferIpAddress: true

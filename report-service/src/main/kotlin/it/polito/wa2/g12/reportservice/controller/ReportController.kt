@@ -7,10 +7,11 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class Controller(val reportservice: ReportServiceImpl) {
+class ReportController(val reportservice: ReportServiceImpl) {
+
     // Use a JSON like this one to test this endpoint:
     // {"initialData": "2022-04-12 12:00:00", "finalData": "2022-06-01 18:00:00"}
-    @GetMapping("report/global")
+    @PostMapping("/report/global")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun globalReport(
         @RequestHeader("Authorization") authorizationHeader: String,
@@ -19,14 +20,13 @@ class Controller(val reportservice: ReportServiceImpl) {
         return reportservice.getGlobalReport(authorizationHeader, dataRange)
     }
 
-    @GetMapping("/report/{username}")
+    @PostMapping("/report/{username}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun globalReport(
         @PathVariable username: String,
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: DataRangeDTO
     ): Flow<String> {
-        println("prova")
         return reportservice.getUserReport(authorizationHeader, dataRange, username)
     }
 }
