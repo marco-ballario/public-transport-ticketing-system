@@ -1,4 +1,4 @@
-package it.polito.wa2.g12.paymentservice.dto
+package it.polito.wa2.g12.reportservice.dto
 
 data class ReportDTO (
     val tickets_purchased : Int,

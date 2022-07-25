@@ -25,7 +25,7 @@ spring:
         - id: report-service
           uri: lb://report-service
           predicates:
-            - Path=/report/**
+            - Path=/admin/report/**
 eureka:
   instance:
     preferIpAddress: true

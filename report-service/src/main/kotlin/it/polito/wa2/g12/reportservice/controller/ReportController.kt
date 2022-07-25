@@ -1,23 +1,25 @@
 package it.polito.wa2.g12.reportservice.controller
 
-import it.polito.wa2.g12.reportservice.dto.DataRangeDTO
+import it.polito.wa2.g12.reportservice.dto.TimePeriodDTO
+import it.polito.wa2.g12.reportservice.dto.ReportDTO
 import it.polito.wa2.g12.reportservice.service.impl.ReportServiceImpl
-import kotlinx.coroutines.flow.Flow
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class ReportController(val reportservice: ReportServiceImpl) {
+@RequestMapping("/admin")
+class ReportController(val reportService: ReportServiceImpl) {
 
     // Use a JSON like this one to test this endpoint:
-    // {"initialData": "2022-04-12 12:00:00", "finalData": "2022-06-01 18:00:00"}
-    @PostMapping("/report/global")
+    // {"start_date": "2022-04-12 12:00:00", "end_date": "2022-06-01 18:00:00"}
+    @PostMapping("/report")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun globalReport(
         @RequestHeader("Authorization") authorizationHeader: String,
-        @RequestBody dataRange: DataRangeDTO
-    ): Flow<String> {
-        return reportservice.getGlobalReport(authorizationHeader, dataRange)
+        @RequestBody dataRange: TimePeriodDTO
+    ): ReportDTO {
+        println("ciao")
+        return reportService.getGlobalReport(authorizationHeader, dataRange)
     }
 
     @PostMapping("/report/{username}")
@@ -25,8 +27,9 @@ class ReportController(val reportservice: ReportServiceImpl) {
     suspend fun globalReport(
         @PathVariable username: String,
         @RequestHeader("Authorization") authorizationHeader: String,
-        @RequestBody dataRange: DataRangeDTO
-    ): Flow<String> {
-        return reportservice.getUserReport(authorizationHeader, dataRange, username)
+        @RequestBody dataRange: TimePeriodDTO
+    ): ReportDTO {
+        println("ciao")
+        return reportService.getUserReport(authorizationHeader, dataRange, username)
     }
 }
