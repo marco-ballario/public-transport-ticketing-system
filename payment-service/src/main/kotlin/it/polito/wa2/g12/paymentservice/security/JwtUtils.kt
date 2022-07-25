@@ -17,7 +17,6 @@ class JwtUtils(@Value("\${jwt.key}") private val key: String) {
         Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(key))).build()
 
     fun validateJwt(authToken: String): Boolean {
-
         try {
             val body = parser.parseClaimsJws(authToken).body
 
@@ -27,9 +26,7 @@ class JwtUtils(@Value("\${jwt.key}") private val key: String) {
 
             if (userId.isBlank() || role.isEmpty() || !(role.any { bItem -> ruoli.any { it.contains(bItem) } }))
                 return false
-
             return true
-
         } catch (e: Exception) {
             return false
         }

@@ -12,8 +12,7 @@ class JwtAuthorizationFilter(private val jwtParser: JwtUtils) : WebFilter {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         // Gets the JWT from the HTTP header
-        val jwt = exchange.request.headers
-            .getFirst("Authorization")?.trim()?.split(" ")?.get(1)
+        val jwt = exchange.request.headers.getFirst("Authorization")?.trim()?.split(" ")?.get(1)
 
         // Validates the extracted JWT
         if (jwt != null && jwtParser.validateJwt(jwt)) {
@@ -23,10 +22,9 @@ class JwtAuthorizationFilter(private val jwtParser: JwtUtils) : WebFilter {
                 null,
                 user.roles.map { SimpleGrantedAuthority(it.trim()) }
             )
-            return chain.filter(exchange)
-                .contextWrite(
-                    ReactiveSecurityContextHolder.withAuthentication(authenticatedUser)
-                )
+            return chain.filter(exchange).contextWrite(
+                ReactiveSecurityContextHolder.withAuthentication(authenticatedUser)
+            )
         }
 
         return chain.filter(exchange)

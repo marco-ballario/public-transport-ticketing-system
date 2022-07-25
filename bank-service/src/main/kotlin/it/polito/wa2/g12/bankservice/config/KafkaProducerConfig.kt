@@ -1,6 +1,5 @@
 package it.polito.wa2.g12.bankservice.config
 
-
 import it.polito.wa2.g12.bankservice.kafka.BankPaymentSerializer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
@@ -11,12 +10,11 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
 
-
 @Configuration
 class KafkaProducerConfig(
-    @Value("\${kafka.bootstrapAddress}")
-    private val servers: String
+    @Value("\${kafka.bootstrapAddress}") private val servers: String
 ) {
+
     @Bean
     fun producerFactory(): ProducerFactory<String, Any> {
         val configProps: MutableMap<String, Any> = HashMap()

@@ -8,21 +8,23 @@ import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 
-
 class JwtAuthorizationFilter(private val jwtParser: JwtUtils) : WebFilter {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
-        // Extract header
+        // Extracts the header
         val token = exchange.request.headers.getFirst("Authorization")?.trim()?.split(" ")?.get(1)
 
-        // Validate JWT
+        // Validates the JWT
         if (token != null && jwtParser.validateJwt(token)) {
             val user = jwtParser.getDetailsJwt(token)
-            val authenticatedUser =
-                UsernamePasswordAuthenticationToken(user.username, null, user.roles.map { SimpleGrantedAuthority(it.trim()) })
-
-            return chain.filter(exchange)
-                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authenticatedUser))
+            val authenticatedUser = UsernamePasswordAuthenticationToken(
+                user.username,
+                null,
+                user.roles.map { SimpleGrantedAuthority(it.trim()) }
+            )
+            return chain.filter(exchange).contextWrite(
+                ReactiveSecurityContextHolder.withAuthentication(authenticatedUser)
+            )
         }
 
         return chain.filter(exchange)
