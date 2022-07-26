@@ -1,5 +1,6 @@
 package it.polito.wa2.g12.transitservice.service.impl
 
+import it.polito.wa2.g12.transitservice.dto.TicketDTO
 import it.polito.wa2.g12.transitservice.dto.TransitDTO
 import it.polito.wa2.g12.transitservice.entity.Transit
 import it.polito.wa2.g12.transitservice.entity.toDTO
@@ -22,8 +23,8 @@ class  TransitServiceImpl : TransitService {
         return transitRepository.findAllTransit().map { it.toDTO() }
     }
 
-    override fun insertNewTransit(ticket_id: Long): Mono<TransitDTO> {
+    override fun insertNewTransit(ticket: TicketDTO): Mono<TransitDTO> {
         val now = LocalDateTime.now()
-        return  mono {transitRepository.save(Transit(now,ticket_id)).toDTO()}
+        return  mono {transitRepository.save(Transit(now,ticket.ticket_id,ticket.ticket_type,ticket.user)).toDTO()}
     }
 }

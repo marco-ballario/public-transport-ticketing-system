@@ -100,7 +100,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
     @GetMapping("/QRCode/{tid}")
     @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
     fun getQRCode(principal: Principal,@PathVariable(value="tid") ticketId:Long): ResponseEntity<Any> {
-        val res = travelerService.getQRCode(ticketId)
+        val res = travelerService.getQRCode(ticketId, principal.name)
         return ResponseEntity(res, HttpStatus.OK)
     }
 

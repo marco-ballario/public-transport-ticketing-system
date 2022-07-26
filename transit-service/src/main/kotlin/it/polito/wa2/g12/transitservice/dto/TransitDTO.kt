@@ -5,6 +5,9 @@ import java.time.LocalDateTime
 
 data class TransitDTO(
     val id : Long,
-    var transit_date: LocalDateTime,
-    var ticket_id: Long,
+    val transit_date: LocalDateTime,
+    val ticket_id: Long,
+    val ticket_type : String,
+    val ticket_user : String,
+
 )
