@@ -1,6 +1,6 @@
-package it.polito.wa2.g12.paymentservice.dto
+package it.polito.wa2.g12.catalogueservice.dto
 
-data class PercentagesDTO(
+data class PurchasesStatsDTO(
     val percOrdinaryTickets: Long,
     val percTravelerCards: Long,
     val ticketsNumber: Int,

@@ -1,6 +1,6 @@
 package it.polito.wa2.g12.catalogueservice.controller
 
-import it.polito.wa2.g12.catalogueservice.dto.PercentagesDTO
+import it.polito.wa2.g12.catalogueservice.dto.PurchasesStatsDTO
 import it.polito.wa2.g12.catalogueservice.service.impl.ReportServiceImpl
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -16,7 +16,7 @@ class ReportController(val reportService: ReportServiceImpl) {
     suspend fun globalReport(
         @RequestBody ordersID: List<Int>,
         @RequestHeader("Authorization") authorizationHeader: String,
-    ): PercentagesDTO {
+    ): PurchasesStatsDTO {
         return reportService.getOrderInfo(ordersID, authorizationHeader)
     }
 }

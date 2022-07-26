@@ -9,5 +9,7 @@ data class UserReportDTO (
     val maxOrder: Float,
     val percClassicTickets: Float,
     val percTravelersCards: Float,
+    val percTransitsClassicTickets: Float,
+    val percTransitsTravelerCards: Float,
     val ticketsNumber: Int
 )

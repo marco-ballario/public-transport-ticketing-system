@@ -7,5 +7,7 @@ data class GlobalReportDTO(
     val avarageProfit: Float,
     val percClassicTickets: Float,
     val percTravelersCards: Float,
-    val ticketsNumber: Int
+    val percTransitsClassicTickets: Float,
+    val percTransitsTravelerCards: Float,
+    val ticketsNumber: Int,
 )

@@ -1,10 +1,7 @@
 package it.polito.wa2.g12.paymentservice.service.impl
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import it.polito.wa2.g12.paymentservice.dto.GlobalReportDTO
-import it.polito.wa2.g12.paymentservice.dto.PercentagesDTO
-import it.polito.wa2.g12.paymentservice.dto.UserReportDTO
-import it.polito.wa2.g12.paymentservice.dto.TimePeriodDTO
+import it.polito.wa2.g12.paymentservice.dto.*
 import it.polito.wa2.g12.paymentservice.entity.toDTO
 import it.polito.wa2.g12.paymentservice.repository.TransactionRepository
 import it.polito.wa2.g12.paymentservice.service.ReportService
@@ -40,7 +37,7 @@ class ReportServiceImpl : ReportService {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .awaitBody()
-        val transits: String = WebClient
+        val response2: String = WebClient
             .create("http://localhost:8087")
             .post()
             .uri("/admin/report/transits")
@@ -50,14 +47,17 @@ class ReportServiceImpl : ReportService {
             .retrieve()
             .awaitBody()
         val ob = jacksonObjectMapper()
-        val percentages = ob.readValue(response, PercentagesDTO::class.java)
+        val percentages = ob.readValue(response, PurchasesStatsDTO::class.java)
+        val transits = ob.readValue(response2, TransitsStatsDTO::class.java)
         return GlobalReportDTO(
             transactionList.count(),
             transactionList.toList().sumOf { it.amount }.toFloat(),
-            transits.toInt(),
+            transits.transits,
             transactionList.toList().sumOf { it.amount }.toFloat() / percentages.ticketsNumber,
             percentages.percOrdinaryTickets.toFloat(),
             percentages.percTravelerCards.toFloat(),
+            transits.percOrdinaryTransits,
+            transits.percTravelerCardsTransits,
             percentages.ticketsNumber
         )
     }
@@ -78,17 +78,29 @@ class ReportServiceImpl : ReportService {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .awaitBody()
+        val response2: String = WebClient
+            .create("http://localhost:8087")
+            .post()
+            .uri("/admin/report/$username/transits")
+            .header("Authorization", jwt)
+            .bodyValue(dataRange)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .awaitBody()
         val ob = jacksonObjectMapper()
-        val percentages = ob.readValue(response, PercentagesDTO::class.java)
+        val percentages = ob.readValue(response, PurchasesStatsDTO::class.java)
+        val transits = ob.readValue(response2, TransitsStatsDTO::class.java)
         return UserReportDTO(
             transactionList.count(),
             transactionList.toList().sumOf { it.amount }.toFloat(),
-            0,
+            transits.transits,
             transactionList.toList().sumOf { it.amount }.toFloat() / percentages.ticketsNumber,
             transactionList.toList().minOf { it.amount }.toFloat(),
             transactionList.toList().maxOf { it.amount }.toFloat(),
             percentages.percOrdinaryTickets.toFloat(),
             percentages.percTravelerCards.toFloat(),
+            transits.percOrdinaryTransits,
+            transits.percTravelerCardsTransits,
             percentages.ticketsNumber
         )
     }
