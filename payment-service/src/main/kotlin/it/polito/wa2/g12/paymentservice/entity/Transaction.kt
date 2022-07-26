@@ -9,19 +9,13 @@ import java.time.LocalDateTime
 
 @Table("transactions")
 class Transaction(
-    @Column
-    var orderId: Int,
-    @Column
-    var username: String,
-    @Column
-    var amount: BigDecimal,
-    @Column
-    var issuedAt: LocalDateTime,
-    @Column
-    var status: String
+    @Column var amount: BigDecimal,
+    @Column var username: String,
+    @Column var issuedAt: LocalDateTime,
+    @Column var orderId: Int,
+    @Column var status: String
 ) {
-    @Id
-    var id: Long? = null
+    @Id var id: Long? = null
 }
 
-fun Transaction.toDTO() = TransactionDTO(id!!, username, amount, issuedAt, orderId, status)
+fun Transaction.toDTO() = TransactionDTO(id!!, amount, username, issuedAt, orderId, status)

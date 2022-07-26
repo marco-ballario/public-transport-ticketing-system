@@ -12,12 +12,10 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
 
-
 @EnableKafka
 @Configuration
 class KafkaConsumerConfig(
-    @Value("\${kafka.bootstrapAddress}")
-    private val servers: String
+    @Value("\${kafka.bootstrapAddress}") private val servers: String
 ) {
 
     @Bean
