@@ -1,5 +1,6 @@
 package it.polito.wa2.g12.transitservice.controller
 
+import it.polito.wa2.g12.transitservice.dto.TimePeriodDTO
 import it.polito.wa2.g12.transitservice.dto.TransitDTO
 import it.polito.wa2.g12.transitservice.service.impl.TransitServiceImpl
 import kotlinx.coroutines.flow.Flow
@@ -27,4 +28,13 @@ class TransitController(val transitService: TransitServiceImpl){
         val ticketId = body.ticket_id
         return  transitService.insertNewTransit(ticketId)
     }
+
+    @PostMapping("/admin/report/transits")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
+    suspend fun getReportTransit(
+        @RequestBody dataRange: TimePeriodDTO
+    ) : Int {
+        return  transitService.getRepTransits(dataRange)
+    }
+
 }

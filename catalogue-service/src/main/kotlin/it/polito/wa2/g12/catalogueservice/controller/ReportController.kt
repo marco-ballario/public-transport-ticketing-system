@@ -13,7 +13,10 @@ class ReportController(val reportService: ReportServiceImpl) {
 
     @PostMapping("/report")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
-    suspend fun globalReport(@RequestBody ordersID: List<Int>): PercentagesDTO {
-        return reportService.getOrderInfo(ordersID)
+    suspend fun globalReport(
+        @RequestBody ordersID: List<Int>,
+        @RequestHeader("Authorization") authorizationHeader: String,
+    ): PercentagesDTO {
+        return reportService.getOrderInfo(ordersID, authorizationHeader)
     }
 }

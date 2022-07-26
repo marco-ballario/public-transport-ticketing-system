@@ -40,12 +40,21 @@ class ReportServiceImpl : ReportService {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .awaitBody()
+        val transits: String = WebClient
+            .create("http://localhost:8087")
+            .post()
+            .uri("/admin/report/transits")
+            .header("Authorization", jwt)
+            .bodyValue(dataRange)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .awaitBody()
         val ob = jacksonObjectMapper()
         val percentages = ob.readValue(response, PercentagesDTO::class.java)
         return GlobalReportDTO(
             transactionList.count(),
             transactionList.toList().sumOf { it.amount }.toFloat(),
-            0,
+            transits.toInt(),
             transactionList.toList().sumOf { it.amount }.toFloat() / percentages.ticketsNumber,
             percentages.percOrdinaryTickets.toFloat(),
             percentages.percTravelerCards.toFloat(),
