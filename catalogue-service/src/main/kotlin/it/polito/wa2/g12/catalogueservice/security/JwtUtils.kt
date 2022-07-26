@@ -21,7 +21,7 @@ class JwtUtils(@Value("\${jwt.secret-key}") private val key: String) {
     fun validateJwt(authToken: String): Boolean {
         try {
             val body = parser.parseClaimsJws(authToken).body
-            val roles = listOf("CUSTOMER", "ADMIN")
+            val roles = listOf("CUSTOMER", "ADMIN","MACHINE","SUPERADMIN")
             val userId = body.getValue("sub").toString()
             val role = body["roles"]
                 .toString()
