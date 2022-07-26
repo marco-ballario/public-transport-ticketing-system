@@ -18,6 +18,7 @@ class WebSecurityConfig {
             .authorizeExchange {
                 it
                     .pathMatchers("/admin/**").hasAuthority("ADMIN")
+                    .pathMatchers("/admin/**").hasAuthority("SUPERADMIN")
                     .and()
                     .addFilterAt(JwtAuthorizationFilter(jwtUtils), SecurityWebFiltersOrder.FIRST)
             }.build()
