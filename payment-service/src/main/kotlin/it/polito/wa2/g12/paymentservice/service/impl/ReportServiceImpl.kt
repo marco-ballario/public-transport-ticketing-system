@@ -10,11 +10,13 @@ import it.polito.wa2.g12.paymentservice.entity.toDTO
 import it.polito.wa2.g12.paymentservice.repository.TransactionRepository
 import it.polito.wa2.g12.paymentservice.service.ReportService
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.reactive.asFlow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
+import reactor.kotlin.core.publisher.toMono
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -26,7 +28,7 @@ class ReportServiceImpl : ReportService {
 
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-    override suspend fun getGlobalReport(dataRange: TimePeriodDTO, jwt: String): GlobalReportDTO {
+    override suspend fun getGlobalReport(dataRange: TimePeriodDTO, jwt: String): Flow<GlobalReportDTO> {
         val transactionList = transactionRepository.findAll().filter {
             it.status == "SUCCESSFUL" &&
             it.issuedAt.isAfter(LocalDateTime.parse(dataRange.start_date, formatter)) &&
@@ -52,10 +54,10 @@ class ReportServiceImpl : ReportService {
             percentages[0].percOrdinaryTickets.toFloat(),
             percentages[0].percTravelerCards.toFloat(),
             percentages[0].ticketsNumber
-        )
+        ).toMono().asFlow()
     }
 
-    override suspend fun getUserReport(dataRange: TimePeriodDTO, username: String, jwt: String): UserReportDTO {
+    override suspend fun getUserReport(dataRange: TimePeriodDTO, username: String, jwt: String): Flow<UserReportDTO> {
         val transactionList = transactionRepository.findAll().filter {
             it.username == username &&
             it.status == "SUCCESSFUL" &&
@@ -83,7 +85,7 @@ class ReportServiceImpl : ReportService {
             percentages[0].percOrdinaryTickets.toFloat(),
             percentages[0].percTravelerCards.toFloat(),
             percentages[0].ticketsNumber
-        )
+        ).toMono().asFlow()
     }
 
 }

@@ -4,6 +4,7 @@ import it.polito.wa2.g12.reportservice.dto.GlobalReportDTO
 import it.polito.wa2.g12.reportservice.dto.TimePeriodDTO
 import it.polito.wa2.g12.reportservice.dto.UserReportDTO
 import it.polito.wa2.g12.reportservice.service.impl.ReportServiceImpl
+import kotlinx.coroutines.flow.Flow
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
@@ -18,7 +19,7 @@ class ReportController(val reportService: ReportServiceImpl) {
     suspend fun globalReport(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: TimePeriodDTO
-    ): GlobalReportDTO {
+    ): Flow<GlobalReportDTO> {
         return reportService.getGlobalReport(authorizationHeader, dataRange)
     }
 
@@ -30,7 +31,7 @@ class ReportController(val reportService: ReportServiceImpl) {
         @PathVariable username: String,
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: TimePeriodDTO
-    ): UserReportDTO {
+    ): Flow<UserReportDTO> {
         return reportService.getUserReport(authorizationHeader, dataRange, username)
     }
 }

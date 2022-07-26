@@ -8,6 +8,7 @@ import it.polito.wa2.g12.catalogueservice.repository.TicketRepository
 import it.polito.wa2.g12.catalogueservice.service.ReportService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import reactor.kotlin.core.publisher.toMono
