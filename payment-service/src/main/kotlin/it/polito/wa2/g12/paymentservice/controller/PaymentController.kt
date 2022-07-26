@@ -17,7 +17,7 @@ class PaymentController(val paymentService: PaymentServiceImpl) {
     }
 
     @GetMapping("/admin/transactions")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     fun getUserTransactions(): Flow<TransactionDTO> {
         return paymentService.getAllTransactions()
     }

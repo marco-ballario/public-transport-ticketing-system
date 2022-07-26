@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 class ReportController(val reportService: ReportServiceImpl) {
 
     @PostMapping("/report")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
     suspend fun globalReport(@RequestBody ordersID: List<Int>): PercentagesDTO {
         return reportService.getOrderInfo(ordersID)
     }

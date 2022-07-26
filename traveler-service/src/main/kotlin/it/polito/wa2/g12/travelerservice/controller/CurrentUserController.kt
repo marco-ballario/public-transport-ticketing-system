@@ -1,10 +1,6 @@
 package it.polito.wa2.g12.travelerservice.controller
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.google.zxing.BinaryBitmap
-import com.google.zxing.MultiFormatReader
-import com.google.zxing.client.j2se.BufferedImageLuminanceSource
-import com.google.zxing.common.HybridBinarizer
 import it.polito.wa2.g12.travelerservice.dto.AcquiredTicketDTO
 import it.polito.wa2.g12.travelerservice.dto.TicketDTO
 import it.polito.wa2.g12.travelerservice.dto.TicketsToAcquireDTO
@@ -15,10 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
-import java.io.ByteArrayInputStream
 import java.security.Principal
-import java.util.*
-import javax.imageio.ImageIO
 
 
 @RestController
@@ -26,7 +19,7 @@ import javax.imageio.ImageIO
 class CurrentUserController(val travelerService: TravelerServiceImpl) {
 
     @GetMapping(value = ["/profile"])
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun getUserDet(principal: Principal): ResponseEntity<Any> {
         val res: UserInfoDTO? = travelerService.getUserDet(principal.name)
         return if (res == null) ResponseEntity("User details not available for ${principal.name}", HttpStatus.NOT_FOUND)
@@ -37,7 +30,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
     // {"name":"test", "address":"test", "date_of_birth":"2022-05-18", "number":"123456789"}
     // All the JSON fields are needed
     @PutMapping("/profile")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun updateUserDet(
         @RequestBody
         body: String,
@@ -56,7 +49,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
     }
 
     @GetMapping("/tickets")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun getTickets(principal: Principal): ResponseEntity<Any> {
         val res: List<AcquiredTicketDTO>? = travelerService.getUserTickets(principal.name)
         return if (res == null) ResponseEntity("UserDetails not available for ${principal.name}", HttpStatus.NOT_FOUND)
@@ -69,7 +62,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
     // {"cmd": "buy_tickets", "quantity": "2", "zones": "ABC"}
     // All the JSON fields are needed
     @PostMapping("/tickets")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun postTickets(
         @RequestBody
         body: String,
@@ -87,7 +80,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
 
     // This endpoint is the one called by the catalogue service to generate tickets
     @PostMapping("/tickets/acquired")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun aquireTickets(
         @RequestBody acquiredTickets: TicketsToAcquireDTO,
         principal: Principal
@@ -98,7 +91,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
 
     // Get QrCode for ticket with id
     @GetMapping("/QRCode/{tid}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun getQRCode(principal: Principal,@PathVariable(value="tid") ticketId:Long): ResponseEntity<Any> {
         val res = travelerService.getQRCode(ticketId)
         return ResponseEntity(res, HttpStatus.OK)

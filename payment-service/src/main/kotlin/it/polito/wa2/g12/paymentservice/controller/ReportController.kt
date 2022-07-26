@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 class ReportController(val reportService: ReportServiceImpl) {
 
     @PostMapping("/report")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     suspend fun globalReport(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: TimePeriodDTO
@@ -23,7 +23,7 @@ class ReportController(val reportService: ReportServiceImpl) {
     }
 
     @PostMapping("/report/{username}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
     suspend fun userReport(
         @RequestHeader("Authorization") authorizationHeader: String,
         @PathVariable username: String,

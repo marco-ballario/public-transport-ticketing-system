@@ -20,26 +20,26 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
     }
 
     @GetMapping("/orders")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun getAllUserOrders(principal: Principal): Flow<OrderDTO> {
         return catalogueService.getAllUserOrders(principal.name)
     }
 
     @GetMapping("/orders/{orderId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     suspend fun getUserOrderById(@PathVariable orderId: Long, principal: Principal): OrderDTO? {
         return catalogueService.getUserOrder(principal.name, orderId)
     }
 
     @GetMapping("/admin/orders")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     fun getAllOrders(): Flow<OrderDTO> {
         return catalogueService.getAllOrders()
     }
 
     // We use the unique nickname of the user as userId
     @GetMapping("/admin/orders/{userId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     fun getAllUserOrders(@PathVariable userId: String): Flow<OrderDTO> {
         return catalogueService.getAllUserOrders(userId)
     }
@@ -47,7 +47,7 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
     // Use a JSON like this one to test this endpoint:
     // {"name":"Super ticket","type":"Ordinary","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
     @PostMapping("/admin/tickets")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     suspend fun addNewTicket(@RequestBody ticket: TicketDTO): ResponseEntity<TicketDTO?> {
         val newTicket = catalogueService.addNewTicket(ticket)
         // In case the information provided are incorrect no ticket will be added
@@ -61,7 +61,7 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
     // Use a JSON like this one to test this endpoint:
     // {"name":"Super ticket","type":"Ordinary","duration":24,"zones":"XYZ","price":"20.00","min_age":18,"max_age":30}
     @PutMapping("/admin/tickets/{ticketId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     suspend fun updateTicket(@PathVariable ticketId: Long, @RequestBody ticket: TicketDTO): ResponseEntity<TicketDTO?> {
         val newTicket = catalogueService.updateTicket(ticketId, ticket)
         return if (newTicket == null) ResponseEntity(null, HttpStatus.UNPROCESSABLE_ENTITY)
@@ -72,7 +72,7 @@ class CatalogueController(val catalogueService: CatalogueServiceImpl) {
     // {"ticket_id":1,"quantity":1,"card_number":"1111222233334444","card_expiration":"01/25","card_cvv":"123","card_holder":"admin"}
     // All the JSON fields are needed
     @PostMapping("/shop")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     suspend fun shopTickets(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody paymentInfo: PaymentInfoDTO,

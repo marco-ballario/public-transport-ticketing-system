@@ -17,8 +17,7 @@ class WebSecurityConfig {
         return http.csrf().disable()
             .authorizeExchange {
                 it
-                    .pathMatchers("/admin/**").hasAuthority("ADMIN")
-                    .pathMatchers("/admin/**").hasAuthority("SUPERADMIN")
+                    .pathMatchers("/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
                     .and()
                     .addFilterAt(JwtAuthorizationFilter(jwtUtils), SecurityWebFiltersOrder.FIRST)
             }.build()
