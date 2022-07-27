@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS transactions CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS transits CASCADE;
 
 CREATE TABLE IF NOT EXISTS transactions
 (
@@ -15,6 +16,14 @@ CREATE TABLE IF NOT EXISTS orders
     ticket_type VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     username VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS transits
+(
+    id SERIAL PRIMARY KEY,
+    ticket_type VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    transit_date TIMESTAMP NOT NULL
 );
 
 INSERT INTO transactions (amount, username, issued_at)

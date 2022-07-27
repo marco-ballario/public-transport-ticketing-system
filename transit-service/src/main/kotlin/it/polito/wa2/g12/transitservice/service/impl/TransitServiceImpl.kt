@@ -6,6 +6,7 @@ import it.polito.wa2.g12.transitservice.dto.TransitDTO
 import it.polito.wa2.g12.transitservice.dto.TransitsStatsDTO
 import it.polito.wa2.g12.transitservice.entity.Transit
 import it.polito.wa2.g12.transitservice.entity.toDTO
+import it.polito.wa2.g12.transitservice.message.SuccessfulTransitMessage
 import it.polito.wa2.g12.transitservice.repository.TransitRepository
 import it.polito.wa2.g12.transitservice.service.TransitService
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.KafkaHeaders
+import org.springframework.messaging.Message
+import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
@@ -21,6 +28,14 @@ import java.time.format.DateTimeFormatter
 
 @Service
 class  TransitServiceImpl : TransitService {
+
+    @Value("\${kafka.topics.successfulTransit}")
+    lateinit var topicSuccessfulTransit: String
+
+    @Autowired
+    @Qualifier("successfulTransitKafkaTemplate")
+    lateinit var kafkaSuccessfulTransitTemplate: KafkaTemplate<String, Any>
+
     @Autowired
     lateinit var transitRepository: TransitRepository
 
@@ -84,8 +99,25 @@ class  TransitServiceImpl : TransitService {
         )
     }
 
-    override fun insertNewTransit(ticket : TicketDTO): Mono<TransitDTO> {
+    override suspend fun insertNewTransit(ticket : TicketDTO): TransitDTO {
         val now = LocalDateTime.now()
-        return  mono {transitRepository.save(Transit(now,ticket.ticket_id,ticket.ticket_type,ticket.user)).toDTO()}
+        val transitEntity = Transit(now,ticket.ticket_id,ticket.ticket_type,ticket.user)
+        val transitDTO = transitRepository.save(transitEntity).toDTO()
+
+        val successfulTransitMessage: Message<SuccessfulTransitMessage> = MessageBuilder
+            .withPayload(
+                SuccessfulTransitMessage(
+                    transitDTO.id,
+                    transitDTO.ticket_type,
+                    transitDTO.ticket_user,
+                    transitDTO.transit_date.toString()
+                )
+            )
+            .setHeader(KafkaHeaders.TOPIC, topicSuccessfulTransit)
+            .setHeader("X-Custom-Header", "Custom header here")
+            .build()
+        kafkaSuccessfulTransitTemplate.send(successfulTransitMessage)
+
+        return transitDTO
     }
 }

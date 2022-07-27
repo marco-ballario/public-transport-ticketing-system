@@ -22,9 +22,9 @@ class TransitController(val transitService: TransitServiceImpl){
     }
 
     @PostMapping("/transits")
-    @PreAuthorize("hasAuthority('MACHINE')")
-    fun insertNewTransit(@RequestBody body : TicketDTO) : Mono<TransitDTO> {
-        return  transitService.insertNewTransit(body)
+    //@PreAuthorize("hasAuthority('MACHINE')")
+    suspend fun insertNewTransit(@RequestBody body : TicketDTO) : TransitDTO {
+        return transitService.insertNewTransit(body)
     }
 
     @PostMapping("/admin/report/transits")

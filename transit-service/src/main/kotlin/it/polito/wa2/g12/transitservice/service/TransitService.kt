@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import reactor.core.publisher.Mono
 
 interface TransitService {
-    fun insertNewTransit(ticket : TicketDTO) : Mono<TransitDTO>
+    suspend fun insertNewTransit(ticket : TicketDTO) : TransitDTO
     fun getAllTransits(): Flow<TransitDTO>
     suspend fun getRepTransits(datarange: TimePeriodDTO): TransitsStatsDTO
     suspend fun getUserRepTransits(datarange: TimePeriodDTO, username: String): TransitsStatsDTO
