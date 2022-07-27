@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -22,7 +21,6 @@ import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.Message
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -52,50 +50,39 @@ class  TransitServiceImpl : TransitService {
         }.count()
         return TransitsStatsDTO(
             transitsCounter,
-            /*
-                 100 * transitRepository.findAllTransit().map { it.transit_date }.filter {
-                    it.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
-                    it.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
-                    it.ticketType == "Ordinary"
+                 100 * transitRepository.findAllTransit().filter {
+                    it.transit_date.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
+                    it.transit_date.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
+                    it.ticket_type == "Ordinary"
+                }.count().toFloat() / transitsCounter.toFloat(),
+                 100 * transitRepository.findAllTransit().filter {
+                    it.transit_date.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
+                    it.transit_date.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
+                    it.ticket_type != "Ordinary"
                 }.count().toFloat() / transitsCounter.toFloat()
-            */
-            0f,
-            /*
-                 100 * transitRepository.findAllTransit().map { it.transit_date }.filter {
-                    it.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
-                    it.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
-                    it.ticketType != "Ordinary"
-                }.count().toFloat() / transitsCounter.toFloat()
-            */
-            0f
         )
     }
 
     override suspend fun getUserRepTransits(datarange: TimePeriodDTO, username: String): TransitsStatsDTO {
-        val transitsCounter = transitRepository.findAllTransit().filter { /*it.username == username &&*/
+        val transitsCounter = transitRepository.findAllTransit().filter {
+              it.ticket_user == username &&
               it.transit_date.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
               it.transit_date.isBefore(LocalDateTime.parse(datarange.end_date, formatter))
         }.count()
         return TransitsStatsDTO(
             transitsCounter,
-            /*
-                 100 * transitRepository.findAllTransit().map { it.transit_date }.filter {
-                    it.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
-                    it.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
-                    it.username == username &&
-                    it.ticketType == "Ordinary"
-                }.count().toFloat() / transitsCounter.toFloat()
-            */
-            0f,
-            /*
-                 100 * transitRepository.findAllTransit().map { it.transit_date }.filter {
-                    it.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
-                    it.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
-                    it.username = username &&
-                    it.ticketType != "Ordinary"
-                }.count().toFloat() / transitsCounter.toFloat()
-            */
-            0f
+            100 * transitRepository.findAllTransit().filter {
+                it.transit_date.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
+                it.transit_date.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
+                it.ticket_user == username &&
+                it.ticket_type == "Ordinary"
+            }.count().toFloat() / transitsCounter.toFloat(),
+            100 * transitRepository.findAllTransit().filter {
+                it.transit_date.isAfter(LocalDateTime.parse(datarange.start_date, formatter)) &&
+                it.transit_date.isBefore(LocalDateTime.parse(datarange.end_date, formatter)) &&
+                it.ticket_user == username &&
+                it.ticket_type != "Ordinary"
+            }.count().toFloat() / transitsCounter.toFloat()
         )
     }
 
