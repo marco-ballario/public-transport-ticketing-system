@@ -43,3 +43,8 @@ INSERT INTO orders (ticket_type, quantity, username)
 VALUES ('Ordinary', 2, 'admin');
 INSERT INTO orders (ticket_type, quantity, username)
 VALUES ('Weekend', 1, 'admin');
+
+INSERT INTO transits (ticket_type, username, transit_date)
+VALUES ('Monthly', 'admin', '2022-05-30 16:00:00.000000');
+INSERT INTO transits (ticket_type, username, transit_date)
+VALUES ('Monthly', 'admin', '2022-07-23 17:30:00.100000');

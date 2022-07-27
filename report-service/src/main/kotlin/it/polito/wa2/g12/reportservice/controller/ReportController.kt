@@ -33,4 +33,15 @@ class ReportController(val reportService: ReportServiceImpl) {
     ): UserReportDTO {
         return reportService.getUserReport(authorizationHeader, dataRange, username)
     }
+
+    // Use a JSON like this one to test this endpoint:
+    // {"start_date": "2022-04-12 12:00:00", "end_date": "2022-06-01 18:00:00"}
+    @PostMapping("/reportv2")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
+    suspend fun globalReportv2(
+        @RequestHeader("Authorization") authorizationHeader: String,
+        @RequestBody dataRange: TimePeriodDTO
+    ): GlobalReportDTO {
+        return reportService.getGlobalReportV2(authorizationHeader, dataRange)
+    }
 }
