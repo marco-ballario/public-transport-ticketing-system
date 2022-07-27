@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RestController
 class AdminController(val travelerService: TravelerServiceImpl) {
 
     @GetMapping("/travelers")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     fun getAllUsers(): ResponseEntity<Any> {
         val res = travelerService.getTravelers()
         return ResponseEntity(res, HttpStatus.OK)
     }
 
     @GetMapping("traveler/{userID}/profile")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     fun getTravelerById(
         @PathVariable userID: Long
     ): ResponseEntity<Any> {
@@ -31,7 +31,7 @@ class AdminController(val travelerService: TravelerServiceImpl) {
     }
 
     @GetMapping("traveler/{userID}/tickets")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
     fun getTravelerTicketsByUserId(
         @PathVariable userID: Long
     ): ResponseEntity<Any> {
@@ -40,7 +40,7 @@ class AdminController(val travelerService: TravelerServiceImpl) {
             "User details not available for specified id: $userID",
             HttpStatus.BAD_REQUEST
         )
-        else if (res!!.isEmpty()) ResponseEntity("No tickets found for the specified user", HttpStatus.NOT_FOUND)
+        else if (res.isEmpty()) ResponseEntity("No tickets found for the specified user", HttpStatus.NOT_FOUND)
         else ResponseEntity(res, HttpStatus.OK)
     }
 }

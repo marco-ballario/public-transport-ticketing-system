@@ -13,12 +13,13 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
+
 @RestController
 @RequestMapping("/my")
 class CurrentUserController(val travelerService: TravelerServiceImpl) {
 
     @GetMapping(value = ["/profile"])
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun getUserDet(principal: Principal): ResponseEntity<Any> {
         val res: UserInfoDTO? = travelerService.getUserDet(principal.name)
         return if (res == null) ResponseEntity("User details not available for ${principal.name}", HttpStatus.NOT_FOUND)
@@ -29,7 +30,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
     // {"name":"test", "address":"test", "date_of_birth":"2022-05-18", "number":"123456789"}
     // All the JSON fields are needed
     @PutMapping("/profile")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun updateUserDet(
         @RequestBody
         body: String,
@@ -48,7 +49,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
     }
 
     @GetMapping("/tickets")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun getTickets(principal: Principal): ResponseEntity<Any> {
         val res: List<AcquiredTicketDTO>? = travelerService.getUserTickets(principal.name)
         return if (res == null) ResponseEntity("UserDetails not available for ${principal.name}", HttpStatus.NOT_FOUND)
@@ -61,7 +62,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
     // {"cmd": "buy_tickets", "quantity": "2", "zones": "ABC"}
     // All the JSON fields are needed
     @PostMapping("/tickets")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun postTickets(
         @RequestBody
         body: String,
@@ -79,7 +80,7 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
 
     // This endpoint is the one called by the catalogue service to generate tickets
     @PostMapping("/tickets/acquired")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
     fun aquireTickets(
         @RequestBody acquiredTickets: TicketsToAcquireDTO,
         principal: Principal
@@ -87,4 +88,13 @@ class CurrentUserController(val travelerService: TravelerServiceImpl) {
         val tickets = travelerService.acquireTickets(acquiredTickets) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
         return ResponseEntity(tickets, HttpStatus.OK)
     }
+
+    // Get QrCode for ticket with id
+    @GetMapping("/QRCode/{tid}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER','SUPERADMIN')")
+    fun getQRCode(principal: Principal,@PathVariable(value="tid") ticketId:Long): ResponseEntity<Any> {
+        val res = travelerService.getQRCode(ticketId, principal.name)
+        return ResponseEntity(res, HttpStatus.OK)
+    }
+
 }

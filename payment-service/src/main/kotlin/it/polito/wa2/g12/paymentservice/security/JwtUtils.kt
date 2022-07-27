@@ -20,7 +20,7 @@ class JwtUtils(@Value("\${jwt.key}") private val key: String) {
         try {
             val body = parser.parseClaimsJws(authToken).body
 
-            val ruoli = listOf("CUSTOMER", "ADMIN")
+            val ruoli = listOf("CUSTOMER", "ADMIN","MACHINE","SUPERADMIN")
             val userId = body.getValue("sub").toString()
             val role = body["roles"].toString().replace("[", "").replace("]", "").split(",")
 

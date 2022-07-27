@@ -18,11 +18,15 @@ import java.time.LocalDateTime
 
 @Component
 class Consumer {
+
     @Value("\${kafka.topics.transaction}")
     lateinit var topicT: String
 
     @Value("\${kafka.topics.bank}")
     lateinit var topic: String
+
+    @Value("\${kafka.topics.successfulTransaction}")
+    lateinit var topicSuccessfulTransaction: String
 
     @Autowired
     @Qualifier("kafkaTemplate")
@@ -31,6 +35,10 @@ class Consumer {
     @Autowired
     @Qualifier("kafkaTemplateBank")
     lateinit var kafkaTemplateBank: KafkaTemplate<String, Any>
+
+    @Autowired
+    @Qualifier("successfulTransactionKafkaTemplate")
+    lateinit var kafkaSuccessfulTransactionTemplate: KafkaTemplate<String, Any>
 
     @Autowired
     lateinit var transactionRepository: TransactionRepository
@@ -102,6 +110,25 @@ class Consumer {
                     .build()
                 kafkaTemplate.send(message)
                 ack.acknowledge()
+
+                // If successful, the transaction is sent to the report service
+                if (res.status == "SUCCESSFUL") {
+                    val successfulTransationMessage: Message<SuccessfulTransactionMessage> = MessageBuilder
+                        .withPayload(
+                            SuccessfulTransactionMessage(
+                                res.id,
+                                res.amount,
+                                res.username,
+                                res.issuedAt.toString()
+                            )
+                        )
+                        .setHeader(KafkaHeaders.TOPIC, topicSuccessfulTransaction)
+                        .setHeader("X-Custom-Header", "Custom header here")
+                        .build()
+                    kafkaSuccessfulTransactionTemplate.send(successfulTransationMessage)
+                    ack.acknowledge()
+                }
+
             }
         }
     }

@@ -6,3 +6,7 @@ CREATE DATABASE catalogue_db;
 GRANT ALL PRIVILEGES ON DATABASE catalogue_db TO postgres;
 CREATE DATABASE payment_db;
 GRANT ALL PRIVILEGES ON DATABASE payment_db TO postgres;
+CREATE DATABASE transit_db;
+GRANT ALL PRIVILEGES ON DATABASE transit_db TO postgres;
+CREATE DATABASE report_db;
+GRANT ALL PRIVILEGES ON DATABASE report_db TO postgres;

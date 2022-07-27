@@ -11,7 +11,8 @@ import org.springframework.kafka.core.KafkaAdmin
 class KafkaConfig(
     @Value("\${kafka.bootstrapAddress}") private val servers: String,
     @Value("\${kafka.topics.payment}") private val topic: String,
-    @Value("\${kafka.topics.transaction}") private val topicTransaction: String
+    @Value("\${kafka.topics.transaction}") private val topicTransaction: String,
+    @Value("\${kafka.topics.successfulTransaction}") private val successfulTransactionTopic: String
 ) {
 
     @Bean
@@ -29,5 +30,10 @@ class KafkaConfig(
     @Bean
     fun transaction(): NewTopic {
         return NewTopic(topicTransaction, 1, 1.toShort())
+    }
+
+    @Bean
+    fun successfulTransaction(): NewTopic {
+        return NewTopic(successfulTransactionTopic, 1, 1.toShort())
     }
 }

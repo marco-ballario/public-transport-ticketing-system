@@ -6,5 +6,8 @@ include(
     "gateway-service",
     "login-service",
     "payment-service",
-    "traveler-service"
+    "report-service",
+    "traveler-service",
+    "transit-service",
+    "machine-mock"
 )

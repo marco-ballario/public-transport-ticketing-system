@@ -9,7 +9,7 @@ class BankPaymentSerializer : Serializer<BankPaymentMessage> {
 
     override fun serialize(topic: String?, data: BankPaymentMessage?): ByteArray? {
         return objectMapper.writeValueAsBytes(
-            data ?: throw SerializationException("Error when serializing Product to ByteArray[]")
+            data ?: throw SerializationException("Error when serializing BankPaymentMessage to ByteArray[]")
         )
     }
 

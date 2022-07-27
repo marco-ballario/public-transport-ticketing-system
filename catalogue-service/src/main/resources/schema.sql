@@ -38,8 +38,8 @@ VALUES (1, 2, 'admin', 'SUCCESSFUL');
 INSERT INTO orders (ticket_id, quantity, username, status)
 VALUES (2, 3, 'admin', 'SUCCESSFUL');
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (1, 2, 'admin', 'FAILED');
+VALUES (1, 2, 'admin', 'SUCCESSFUL');
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (2, 1, 'admin', 'FAILED');
+VALUES (2, 1, 'admin', 'SUCCESSFUL');
 INSERT INTO orders (ticket_id, quantity, username, status)
-VALUES (1, 1, 'customer', 'FAILED');
+VALUES (1, 1, 'admin', 'FAILED');

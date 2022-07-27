@@ -6,4 +6,5 @@ data class TicketsToAcquireDTO(
     val zones: String,
     val quantity: Int,
     val username: String,
+    val only_weekends: Boolean
 )

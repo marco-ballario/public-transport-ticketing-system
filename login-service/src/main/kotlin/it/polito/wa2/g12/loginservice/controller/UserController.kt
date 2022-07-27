@@ -5,6 +5,7 @@ import it.polito.wa2.g12.loginservice.service.impl.UserServiceImpl
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -56,6 +57,17 @@ class UserController(val userService: UserServiceImpl) {
         } else {
             response.addHeader(httpHeaderName, bearerPrefix + token)
             ResponseEntity(token, HttpStatus.OK)
+        }
+    }
+
+    @PostMapping("/admin")
+    @PreAuthorize("hasAnyAuthority('SUPERADMIN')")
+    fun adminRegister(@RequestBody @Valid admin: AdminDTO,br:BindingResult) : ResponseEntity<UserDTO> {
+        val admindto = userService.adminReg(admin);
+        return if(admindto == null) {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
+        } else  {
+            ResponseEntity(admindto, HttpStatus.OK)
         }
     }
 }

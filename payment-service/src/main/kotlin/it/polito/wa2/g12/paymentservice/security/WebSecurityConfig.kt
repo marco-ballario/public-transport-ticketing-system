@@ -17,7 +17,7 @@ class WebSecurityConfig {
         return http.csrf().disable()
             .authorizeExchange {
                 it
-                    .pathMatchers("/admin/**").hasAuthority("ADMIN")
+                    .pathMatchers("/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
                     .pathMatchers("/product/**").permitAll()
                     .pathMatchers("/**").authenticated()
                     .and()

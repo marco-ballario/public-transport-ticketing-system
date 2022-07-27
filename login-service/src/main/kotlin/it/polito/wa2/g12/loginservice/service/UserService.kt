@@ -1,9 +1,6 @@
 package it.polito.wa2.g12.loginservice.service
 
-import it.polito.wa2.g12.loginservice.dto.ActivationDTO
-import it.polito.wa2.g12.loginservice.dto.RegistrationDTO
-import it.polito.wa2.g12.loginservice.dto.TokenDTO
-import it.polito.wa2.g12.loginservice.dto.UserDTO
+import it.polito.wa2.g12.loginservice.dto.*
 
 interface UserService {
     fun isValidPwd(pwd: String): Boolean
@@ -15,4 +12,5 @@ interface UserService {
     fun userReg(newUser: RegistrationDTO): ActivationDTO
     fun completedReg(token: TokenDTO): UserDTO?
     fun login(username: String, password: String): String?
+    fun adminReg(admin: AdminDTO): UserDTO?
 }
