@@ -9,7 +9,7 @@ spring:
         - id: login-service
           uri: lb://login-service
           predicates:
-            - Path=/user/**
+            - Path=/user/**, /admin
           filters:
             - name: CircuitBreaker
               args:
@@ -50,6 +50,24 @@ spring:
             - name: CircuitBreaker
               args:
                 name: report-service-circuit-breaker
+                fallbackUri: forward:/fallback
+        - id: transit-service
+          uri: lb://transit-service
+          predicates:
+            - Path=/admin/transits, /transits
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: transit-service-circuit-breaker
+                fallbackUri: forward:/fallback
+        - id: machine-mock
+          uri: lb://machine-mock
+          predicates:
+            - Path=/machine
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: machine-mock-circuit-breaker
                 fallbackUri: forward:/fallback
 eureka:
   instance:

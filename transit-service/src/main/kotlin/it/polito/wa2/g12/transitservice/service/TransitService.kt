@@ -5,7 +5,6 @@ import it.polito.wa2.g12.transitservice.dto.TicketDTO
 import it.polito.wa2.g12.transitservice.dto.TransitDTO
 import it.polito.wa2.g12.transitservice.dto.TransitsStatsDTO
 import kotlinx.coroutines.flow.Flow
-import reactor.core.publisher.Mono
 
 interface TransitService {
     suspend fun insertNewTransit(ticket : TicketDTO) : TransitDTO
