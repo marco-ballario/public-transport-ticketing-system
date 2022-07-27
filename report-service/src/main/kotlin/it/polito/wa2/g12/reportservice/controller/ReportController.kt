@@ -26,7 +26,7 @@ class ReportController(val reportService: ReportServiceImpl) {
     // {"start_date": "2022-04-12 12:00:00", "end_date": "2022-06-01 18:00:00"}
     @PostMapping("/report/{username}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
-    suspend fun globalReport(
+    suspend fun userReport(
         @PathVariable username: String,
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: TimePeriodDTO
@@ -36,12 +36,25 @@ class ReportController(val reportService: ReportServiceImpl) {
 
     // Use a JSON like this one to test this endpoint:
     // {"start_date": "2022-04-12 12:00:00", "end_date": "2022-06-01 18:00:00"}
-    @PostMapping("/reportv2")
+    @PostMapping("/stats")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
-    suspend fun globalReportv2(
+    suspend fun globalStats(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody dataRange: TimePeriodDTO
     ): GlobalReportDTO {
-        return reportService.getGlobalReportV2(authorizationHeader, dataRange)
+        return reportService.getGlobalStats(authorizationHeader, dataRange)
+    }
+
+    // Use a JSON like this one to test this endpoint:
+    // {"start_date": "2022-04-12 12:00:00", "end_date": "2022-06-01 18:00:00"}
+    @PostMapping("/stats/{username}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
+    suspend fun userStats(
+        @PathVariable username: String,
+        @RequestHeader("Authorization") authorizationHeader: String,
+        @RequestBody dataRange: TimePeriodDTO
+    ): UserReportDTO {
+        println("HELLO")
+        return reportService.getUserStats(authorizationHeader, dataRange, username)
     }
 }

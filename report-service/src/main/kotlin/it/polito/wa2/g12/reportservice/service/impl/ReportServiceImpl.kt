@@ -60,15 +60,19 @@ class ReportServiceImpl : ReportService {
         return ob.readValue(response, UserReportDTO::class.java)
     }
 
-    suspend fun getGlobalReportV2(jwt: String, dataRange: TimePeriodDTO): GlobalReportDTO {
+    suspend fun getGlobalStats(jwt: String, dataRange: TimePeriodDTO): GlobalReportDTO {
         var transactionsList = transactionRepository.findAll().filter {
             it.issuedAt.isAfter(LocalDateTime.parse(dataRange.start_date, formatter)) &&
             it.issuedAt.isBefore(LocalDateTime.parse(dataRange.end_date, formatter))
         }.toList()
-        var orderList = orderRepository.findAll().filter {
-            it.id!! >= transactionsList.minOf { it.id!! } &&
-            it.id!! <= transactionsList.maxOf { it.id!! }
-        }.toList()
+        var orderList = if (transactionsList.count() != 0) {
+            orderRepository.findAll().filter {
+                it.id!! >= transactionsList.minOf { it.id!! } &&
+                it.id!! <= transactionsList.maxOf { it.id!! }
+            }.toList()
+        } else {
+            emptyList()
+        }
         var transitList = transitRepository.findAll().filter {
             it.transit_date.isAfter(LocalDateTime.parse(dataRange.start_date, formatter)) &&
             it.transit_date.isBefore(LocalDateTime.parse(dataRange.end_date, formatter))
@@ -78,6 +82,7 @@ class ReportServiceImpl : ReportService {
         val ordersCount = orderList.count()
         val totalTickets = orderList.map { it.quantity }.sum()
         val ordinaryTicketsCount = orderList.filter { it.ticket_type == "Ordinary" }.map { it.quantity }.sum().toFloat()
+        val ordinaryTransitCount = transitList.filter { it.ticket_type == "Ordinary" }.count()
 
         return GlobalReportDTO(
             transactionsList.count(),
@@ -86,8 +91,53 @@ class ReportServiceImpl : ReportService {
             totalProfits / totalTickets,
             ordinaryTicketsCount / totalTickets * 100,
             (totalTickets - ordinaryTicketsCount) / totalTickets * 100,
-            0f,
-            0f,
+            ordinaryTransitCount.toFloat() / transitList.count(),
+            (transitList.count() - ordinaryTransitCount.toFloat()) / transitList.count(),
+            totalTickets
+        )
+    }
+
+    suspend fun getUserStats(jwt: String, dataRange: TimePeriodDTO, username: String): UserReportDTO {
+
+        var transactionsList = transactionRepository.findAll().filter {
+            it.username == username &&
+            it.issuedAt.isAfter(LocalDateTime.parse(dataRange.start_date, formatter)) &&
+            it.issuedAt.isBefore(LocalDateTime.parse(dataRange.end_date, formatter))
+        }.toList()
+
+        var orderList = if (transactionsList.count() != 0) {
+            orderRepository.findAll().filter {
+                it.id!! >= transactionsList.minOf { it.id!! } &&
+                        it.id!! <= transactionsList.maxOf { it.id!! }
+            }.toList()
+        } else {
+            emptyList()
+        }
+
+        var transitList = transitRepository.findAll().filter {
+            it.username == username &&
+            it.transit_date.isAfter(LocalDateTime.parse(dataRange.start_date, formatter)) &&
+            it.transit_date.isBefore(LocalDateTime.parse(dataRange.end_date, formatter))
+        }.toList()
+
+        val totalProfits = transactionsList.sumOf { it.amount }.toFloat()
+        val ordersCount = orderList.count()
+        val totalTickets = orderList.map { it.quantity }.sum()
+
+        val ordinaryTicketsCount = orderList.filter { it.ticket_type == "Ordinary" }.map { it.quantity }.sum().toFloat()
+        val ordinaryTransitCount = transitList.filter { it.ticket_type == "Ordinary" }.count()
+
+        return UserReportDTO(
+            transactionsList.count(),
+            totalProfits,
+            transitList.count(),
+            if (totalTickets != 0) totalProfits / totalTickets else 0f,
+            if (transactionsList.isNotEmpty()) transactionsList.maxOf { it.amount }.toFloat() else 0f,
+            if (transactionsList.isNotEmpty()) transactionsList.minOf { it.amount }.toFloat() else 0f,
+            if (totalTickets != 0) ordinaryTicketsCount / totalTickets * 100 else 0f,
+            if (totalTickets != 0) (totalTickets - ordinaryTicketsCount) / totalTickets * 100 else 0f,
+            if (transitList.isNotEmpty()) ordinaryTransitCount.toFloat() / transitList.count() else 0f,
+            if (transitList.isNotEmpty()) (transitList.count() - ordinaryTransitCount.toFloat()) / transitList.count() else 0f,
             totalTickets
         )
     }

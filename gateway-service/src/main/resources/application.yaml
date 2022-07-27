@@ -45,7 +45,7 @@ spring:
         - id: report-service
           uri: lb://report-service
           predicates:
-            - Path=/admin/report/**
+            - Path=/admin/report/**, /admin/stats/**
           filters:
             - name: CircuitBreaker
               args:
