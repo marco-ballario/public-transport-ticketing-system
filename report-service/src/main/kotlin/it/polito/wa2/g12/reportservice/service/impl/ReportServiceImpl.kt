@@ -88,11 +88,11 @@ class ReportServiceImpl : ReportService {
             transactionsList.count(),
             totalProfits,
             transitList.count(),
-            totalProfits / totalTickets,
-            ordinaryTicketsCount / totalTickets * 100,
-            (totalTickets - ordinaryTicketsCount) / totalTickets * 100,
-            ordinaryTransitCount.toFloat() / transitList.count(),
-            (transitList.count() - ordinaryTransitCount.toFloat()) / transitList.count(),
+            if (totalTickets != 0) totalProfits / totalTickets else 0f,
+            if (totalTickets != 0) ordinaryTicketsCount / totalTickets * 100 else 0f,
+            if (totalTickets != 0) (totalTickets - ordinaryTicketsCount) / totalTickets * 100 else 0f,
+            if (transitList.isNotEmpty()) ordinaryTransitCount.toFloat() / transitList.count() * 100 else 0f,
+            if (transitList.isNotEmpty()) (transitList.count() - ordinaryTransitCount.toFloat()) / transitList.count() * 100 else 0f,
             totalTickets
         )
     }
@@ -132,12 +132,12 @@ class ReportServiceImpl : ReportService {
             totalProfits,
             transitList.count(),
             if (totalTickets != 0) totalProfits / totalTickets else 0f,
-            if (transactionsList.isNotEmpty()) transactionsList.maxOf { it.amount }.toFloat() else 0f,
             if (transactionsList.isNotEmpty()) transactionsList.minOf { it.amount }.toFloat() else 0f,
+            if (transactionsList.isNotEmpty()) transactionsList.maxOf { it.amount }.toFloat() else 0f,
             if (totalTickets != 0) ordinaryTicketsCount / totalTickets * 100 else 0f,
             if (totalTickets != 0) (totalTickets - ordinaryTicketsCount) / totalTickets * 100 else 0f,
-            if (transitList.isNotEmpty()) ordinaryTransitCount.toFloat() / transitList.count() else 0f,
-            if (transitList.isNotEmpty()) (transitList.count() - ordinaryTransitCount.toFloat()) / transitList.count() else 0f,
+            if (transitList.isNotEmpty()) ordinaryTransitCount.toFloat() / transitList.count() * 100 else 0f,
+            if (transitList.isNotEmpty()) (transitList.count() - ordinaryTransitCount.toFloat()) / transitList.count() * 100 else 0f,
             totalTickets
         )
     }
