@@ -8,13 +8,14 @@ import io.jsonwebtoken.Jwts
 import it.polito.wa2.g12.machinemock.dto.LoginDTO
 import it.polito.wa2.g12.machinemock.dto.TransitDTO
 import kotlinx.coroutines.reactor.mono
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
+import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.util.*
@@ -29,7 +30,7 @@ class MachineController(private val secretKey: SecretKey) {
     private val jwtParser = Jwts.parserBuilder().setSigningKey(secretKey).build()
     @PostMapping("/machine")
     fun decodeQr(@RequestBody body : String): Mono<Any> {
-        return mono {
+           return mono {
            val login_jwt : String= WebClient.create("http://localhost:8081")
                 .post()
                 .uri("/user/login")
@@ -46,38 +47,40 @@ class MachineController(private val secretKey: SecretKey) {
             val binaryBitmap = BinaryBitmap(hybridBinarizer)
             val multiFormatReader = MultiFormatReader()
             val token = multiFormatReader.decode(binaryBitmap).text
-            println(token)
-            try {
+            val err = try {
                 if (token.trim().isEmpty() )
                     throw Exception()
                 val jws = jwtParser.parseClaimsJws(token)
                 val now = Calendar.getInstance().time
-                if (now > jws.body.expiration)
+                val ext = jws.body.expiration
+                ext.time = ext.time/1000
+                if (now.time > ext.time)
                     throw Exception()
+                false
             }
             catch (e:Exception) {
-                "jwt is not valid"
+                true
             }
-            val jws = jwtParser.parseClaimsJws(token)
-            val ticket_id: Long= jws.body.subject.toLong()
-            val type : String = jws.body["type"].toString()
-            val user : String = jws.body["user"].toString()
-            println("Bearer "+login_jwt)
-            val res:TransitDTO = WebClient.create("http://localhost:8087")
-                .post()
-                .uri("/transits")
-                .header("Authorization","Bearer "+login_jwt)
-                .accept()
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(TransitBody(ticket_id,type,user)))
-                .retrieve()
-                .awaitBody()
-            "ticket validiated and transit inserted"
+            if(err)
+                "jwt is invalid"
+            else {
+                val jws = jwtParser.parseClaimsJws(token)
+                val ticket_id: Long= jws.body.subject.toLong()
+                val type : String = jws.body["type"].toString()
+                val user : String = jws.body["user"].toString()
+                val res:TransitDTO = WebClient.create("http://localhost:8087")
+                    .post()
+                    .uri("/transits")
+                    .header("Authorization","Bearer "+login_jwt)
+                    .accept()
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(BodyInserters.fromValue(TransitBody(ticket_id,type,user)))
+                    .retrieve()
+                    .awaitBody()
+               "jwt is valid"
+            }
         }
 
     }
-
-
-
 }
