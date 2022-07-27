@@ -179,23 +179,21 @@ class TravelerServiceImpl : TravelerService {
         return acquiredTickets
     }
 
-    override fun getQRCode(ticketId: Long) : String{
+    override fun getQRCode(ticketId: Long, username:String) : String {
         val ticket = ticketsRepo.findById(ticketId).get()
         //generate jws
         val exp = ticket.deadline.time
         val iat = ticket.issuedAt.time
         val claims =
-            mapOf<String, Any>("sub" to ticket.getId()!!, "exp" to exp, "vz" to ticket.zone, "iat" to iat)
+            mapOf<String, Any>("sub" to ticket.getId()!!, "exp" to exp, "vz" to ticket.zone, "iat" to iat,"user" to username, "type" to ticket.type)
         val jws = Jwts.builder().setClaims(claims).signWith(secretKey).compact()
         //val qr = Encoder.encode(jws,ErrorCorrectionLevel.M)
-        val qr = MultiFormatWriter().encode(jws, BarcodeFormat.QR_CODE,50,50)
+        val qr = MultiFormatWriter().encode(jws, BarcodeFormat.QR_CODE, 50, 50)
         val bos = ByteArrayOutputStream()
-        MatrixToImageWriter.writeToStream(qr,"png",bos)
+        MatrixToImageWriter.writeToStream(qr, "png", bos)
         val image = Base64.getEncoder().encodeToString(bos.toByteArray())
         return image
-
     }
-
     // Resets the time part of a Date object to zero
     private fun resetTime(calendar: Calendar, date: Date): Date {
         calendar.time = date

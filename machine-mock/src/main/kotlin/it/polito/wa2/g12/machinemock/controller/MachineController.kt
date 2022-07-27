@@ -21,7 +21,7 @@ import java.util.*
 import javax.crypto.SecretKey
 import javax.imageio.ImageIO
 
-data class TransitBody(val ticket_id : Long)
+data class TransitBody(val ticket_id : Long,val ticket_type:String,val user : String)
 
 @RestController
 class MachineController(private val secretKey: SecretKey) {
@@ -60,6 +60,8 @@ class MachineController(private val secretKey: SecretKey) {
             }
             val jws = jwtParser.parseClaimsJws(token)
             val ticket_id: Long= jws.body.subject.toLong()
+            val type : String = jws.body["type"].toString()
+            val user : String = jws.body["user"].toString()
             println("Bearer "+login_jwt)
             val res:TransitDTO = WebClient.create("http://localhost:8087")
                 .post()
@@ -68,7 +70,7 @@ class MachineController(private val secretKey: SecretKey) {
                 .accept()
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(TransitBody(ticket_id)))
+                .body(BodyInserters.fromValue(TransitBody(ticket_id,type,user)))
                 .retrieve()
                 .awaitBody()
             "ticket validiated and transit inserted"
