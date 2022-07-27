@@ -1,4 +1,4 @@
-package it.polito.wa2.g12.catalogueservice.config
+package it.polito.wa2.g12.reportservice.config
 
 import org.apache.kafka.clients.admin.AdminClientConfig
 import org.apache.kafka.clients.admin.NewTopic
@@ -10,8 +10,7 @@ import org.springframework.kafka.core.KafkaAdmin
 @Configuration
 class KafkaConfig(
     @Value("\${kafka.bootstrapAddress}") private val servers: String,
-    @Value("\${kafka.topics.payment}") private val topic: String,
-    @Value("\${kafka.topics.transaction}") private val topicTransaction: String,
+    @Value("\${kafka.topics.successfulTransaction}") private val successfulTransactionTopic: String,
     @Value("\${kafka.topics.successfulOrder}") private val successfulOrderTopic: String
 ) {
 
@@ -21,15 +20,10 @@ class KafkaConfig(
         configs[AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG] = servers
         return KafkaAdmin(configs)
     }
-
+    
     @Bean
-    fun payment(): NewTopic {
-        return NewTopic(topic, 1, 1.toShort())
-    }
-
-    @Bean
-    fun transaction(): NewTopic {
-        return NewTopic(topicTransaction, 1, 1.toShort())
+    fun successfulTransaction(): NewTopic {
+        return NewTopic(successfulTransactionTopic, 1, 1.toShort())
     }
 
     @Bean

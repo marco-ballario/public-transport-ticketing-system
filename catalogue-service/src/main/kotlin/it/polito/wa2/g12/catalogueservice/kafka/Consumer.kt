@@ -11,9 +11,15 @@ import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runBlocking
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.Acknowledgment
+import org.springframework.kafka.support.KafkaHeaders
+import org.springframework.messaging.Message
+import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
@@ -21,6 +27,14 @@ import org.springframework.web.reactive.function.client.awaitBody
 
 @Component
 class Consumer {
+
+    @Value("\${kafka.topics.successfulOrder}")
+    lateinit var topicSuccessfulOrder: String
+
+    @Autowired
+    @Qualifier("kafkaSuccessfulOrderTemplate")
+    lateinit var kafkaSuccessfulOrderTemplate: KafkaTemplate<String, Any>
+
     @Autowired
     lateinit var ticketRepository: TicketRepository
 
@@ -32,7 +46,7 @@ class Consumer {
         val message = consumerRecord.value() as TransactionMessage
         if (message.status == "FAILED") {
             mono {
-                var order = orderRepository.findById(message.order_id.toLong())
+                val order = orderRepository.findById(message.order_id.toLong())
                 order
             }.subscribe {
                 it.status = message.status
@@ -40,7 +54,7 @@ class Consumer {
             }
         } else {
             mono {
-                var order = runBlocking { orderRepository.findById(message.order_id.toLong()) }
+                val order = runBlocking { orderRepository.findById(message.order_id.toLong()) }
                 val ticket: TicketDTO? = runBlocking { ticketRepository.findById(order!!.ticketId)?.toDTO() }
                 val ticketsToAcquire = TicketsToAcquireDTO(
                     ticket!!.type.name,
@@ -65,6 +79,22 @@ class Consumer {
                     .awaitBody()
                 order.status = message.status
                 orderRepository.save(order)
+
+                // If successful, the order is sent to the report service
+                val successfulOrderMessage: Message<SuccessfulOrderMessage> = MessageBuilder
+                    .withPayload(
+                        SuccessfulOrderMessage(
+                            order.id,
+                            ticket.type.name,
+                            order.quantity,
+                            order.username
+                        )
+                    )
+                    .setHeader(KafkaHeaders.TOPIC, topicSuccessfulOrder)
+                    .setHeader("X-Custom-Header", "Custom header here")
+                    .build()
+                kafkaSuccessfulOrderTemplate.send(successfulOrderMessage)
+
                 acquiredTickets
             }.subscribe {
                 // Prints tickets acquired for debug purposes

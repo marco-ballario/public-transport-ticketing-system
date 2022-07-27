@@ -10,7 +10,7 @@ class BankDeserializer : Deserializer<BankMessage> {
     override fun deserialize(topic: String?, data: ByteArray?): BankMessage? {
         return objectMapper.readValue(
             String(
-                data ?: throw SerializationException("Error when deserializing byte[] to Product"), Charsets.UTF_8
+                data ?: throw SerializationException("Error when deserializing byte[] to BankMessage"), Charsets.UTF_8
             ), BankMessage::class.java
         )
     }
